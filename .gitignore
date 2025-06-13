@@ -1,0 +1,8 @@
+# Ignorar carpeta target (Maven)
+target/
+
+# Ignorar archivos de configuración de Eclipse
+.classpath
+.project
+.factorypath
+.settings/
