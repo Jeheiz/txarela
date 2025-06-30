@@ -115,6 +115,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
+        
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -134,10 +135,10 @@
 						<id>generate-sources</id>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <sourceRoot>${basedir}/src/main/java</sourceRoot>
+                              <sourceRoot>${project.build.directory}/generated-sources/cxf</sourceRoot>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <wsdl>${basedir}/src/main/resources/wsdl/online/x53jiServicioIntermediacion.wsdl</wsdl>
+                                             <wsdl>${project.basedir}/src/main/resources/wsdl/online/x53jiServicioIntermediacion.wsdl</wsdl>
                                     <wsdlLocation>classpath:wsdl/online/x53jiServicioIntermediacion.wsdl</wsdlLocation>
                                     <extraargs>
                                         <extraarg>-validate</extraarg>
