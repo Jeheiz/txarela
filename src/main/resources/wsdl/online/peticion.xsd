@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- editado con XMLSpy v2015 (http://www.altova.com) por EJIE, S.A. (EJIE, S.A.) -->
-<xs:schema xmlns="http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion" xmlns:ns1="http://intermediacion.redsara.es/scsp/esquemas/ittaxtela/online/peticion/datosespecificos" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion" elementFormDefault="qualified" attributeFormDefault="unqualified">
-	<xs:import namespace="http://intermediacion.redsara.es/scsp/esquemas/ittaxtela/online/peticion/datosespecificos" schemaLocation="datos-especificos-peticion.xsd"/>
+<xs:schema
+  targetNamespace="http://intermediacion.redsara.es/scsp/esquemas/ittaxtela/online/peticion"
+  xmlns="http://intermediacion.redsara.es/scsp/esquemas/ittaxtela/online/peticion"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns1="http://intermediacion.redsara.es/scsp/esquemas/ittaxtela/online/peticion/datosespecificos"
+  elementFormDefault="qualified">
+<xs:import
+  namespace="http://intermediacion.redsara.es/scsp/esquemas/ittaxtela/online/peticion/datosespecificos"
+  schemaLocation="datos-especificos-peticion.xsd"/>
+
 	<xs:element name="Apellido1">
 		<xs:simpleType>
 			<xs:restriction base="xs:string">
@@ -245,12 +253,13 @@
 			</xs:restriction>
 		</xs:simpleType>
 	</xs:element>
-	<xs:element name="Peticion">
+	<xs:element name="Respuesta">
 		<xs:complexType>
-			<xs:all>
+			<xs:sequence>
 				<xs:element ref="Atributos"/>
-				<xs:element ref="Solicitudes"/>
-			</xs:all>
+				<xs:element ref="Transmisiones" minOccurs="0"/>
+				<!-- Las transmisiones son opcionales en caso de que la repuesta no este preparada y se devuelva un TER -->
+			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="Solicitante">
@@ -264,22 +273,6 @@
 				<xs:element ref="Consentimiento"/>
 				<xs:element ref="Funcionario" minOccurs="0"/>
 				<xs:element ref="IdExpediente" minOccurs="0"/>
-			</xs:all>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="Solicitudes">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="SolicitudTransmision" maxOccurs="unbounded"/>
-			</xs:sequence>
-			<xs:attribute name="Id" type="xs:string" use="optional"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="SolicitudTransmision">
-		<xs:complexType>
-			<xs:all>
-				<xs:element ref="DatosGenericos"/>
-				<xs:element ref="ns1:DatosEspecificos" minOccurs="0"/>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>
@@ -326,9 +319,27 @@
 			<xs:all>
 				<xs:element ref="CodigoCertificado"/>
 				<xs:element ref="IdSolicitud"/>
-				<xs:element ref="IdTransmision" minOccurs="0"/>
-				<xs:element ref="FechaGeneracion" minOccurs="0"/>
+				<xs:element ref="IdTransmision"/>
+				<xs:element ref="FechaGeneracion"/>
 			</xs:all>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TransmisionDatos">
+		<xs:complexType>
+			<xs:all>
+				<xs:element ref="DatosGenericos"/>
+				<xs:element ref="ns1:DatosEspecificos"/>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+	<!--
+Las transmisiones son opcionales en caso de devolver en la respuesta un nuevo TER.
+-->
+	<xs:element name="Transmisiones" nillable="false">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="TransmisionDatos" maxOccurs="unbounded"/>
+			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 </xs:schema>
