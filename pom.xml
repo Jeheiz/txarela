@@ -20,11 +20,12 @@
 	<name>ittxartela-ws-server</name>
 	<description>Proyecto IT TXARTELA Services</description>
 
-	<properties>
-		<java.version>11</java.version>
+	  <properties>
+        <java.version>11</java.version>
         <cxf.version>3.5.8</cxf.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
-
     <dependencies>
 		<dependency>
     		<groupId>commons-io</groupId>
@@ -108,60 +109,66 @@
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-       <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
+      <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
+      <plugins>
+    <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+    </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.2.0</version>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.3.1</version>
+        <configuration>
+            <encoding>${project.build.sourceEncoding}</encoding>
+        </configuration>
+    </plugin>
+
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>
+        <configuration>
+            <source>${java.version}</source>
+            <target>${java.version}</target>
+        </configuration>
+    </plugin>
+
+    <plugin>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-codegen-plugin</artifactId>
+        <version>${cxf.version}</version>
+        <executions>
+            <execution>
+                <id>generate-sources</id>
+                <phase>generate-sources</phase>
                 <configuration>
-                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <sourceRoot>${project.build.directory}/generated-sources/cxf</sourceRoot>
+                    <wsdlOptions>
+                        <wsdlOption>
+                            <wsdl>${project.basedir}/src/main/resources/wsdl/online/x53jiServicioIntermediacion.wsdl</wsdl>
+                            <wsdlLocation>classpath:wsdl/online/x53jiServicioIntermediacion.wsdl</wsdlLocation>
+                            <extraargs>
+                                <extraarg>-validate</extraarg>
+                                <extraarg>-exsh</extraarg>
+                                <extraarg>true</extraarg>
+                            </extraargs>
+                        </wsdlOption>
+                    </wsdlOptions>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-codegen-plugin</artifactId>
-                <version>${cxf.version}</version>
-                <executions>
-					<execution>
-						<id>generate-sources</id>
-                        <phase>generate-sources</phase>
-                        <configuration>
-                              <sourceRoot>${project.build.directory}/generated-sources/cxf</sourceRoot>
-                            <wsdlOptions>
-                                <wsdlOption>
-                                             <wsdl>${project.basedir}/src/main/resources/wsdl/online/x53jiServicioIntermediacion.wsdl</wsdl>
-                                    <wsdlLocation>classpath:wsdl/online/x53jiServicioIntermediacion.wsdl</wsdlLocation>
-                                    <extraargs>
-                                        <extraarg>-validate</extraarg>
-                                        <extraarg>-exsh</extraarg>
-                                        <extraarg>true</extraarg>
-                                    </extraargs>
-                                </wsdlOption>
-                            </wsdlOptions>
-                        </configuration>
-                        <goals>
-                            <goal>wsdl2java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
+                <goals>
+                    <goal>wsdl2java</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
+</plugins>
     </build>
-</project>
+</project>  
