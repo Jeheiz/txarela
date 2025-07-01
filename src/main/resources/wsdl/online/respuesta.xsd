@@ -1,32 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- editado con XMLSpy v2015 (http://www.altova.com) por EJIE, S.A. (EJIE, S.A.) -->
-<xs:schema xmlns="http://intermediacion.redsara.es/scsp/esquemas/V3/online/respuesta" xmlns:ns1="http://intermediacion.redsara.es/scsp/esquemas/ittaxtela/online/respuesta/datosespecificos" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://intermediacion.redsara.es/scsp/esquemas/V3/online/respuesta" elementFormDefault="qualified" attributeFormDefault="unqualified">
-	<xs:import namespace="http://intermediacion.redsara.es/scsp/esquemas/ittaxtela/online/respuesta/datosespecificos" schemaLocation="datos-especificos-respuesta.xsd"/>
-	<xs:element name="Apellido1">
-		<xs:simpleType>
-			<xs:restriction base="xs:string">
-				<xs:maxLength value="40"/>
-			</xs:restriction>
-		</xs:simpleType>
-	</xs:element>
-	<xs:element name="Apellido2">
-		<xs:simpleType>
-			<xs:restriction base="xs:string">
-				<xs:maxLength value="40"/>
-			</xs:restriction>
-		</xs:simpleType>
-	</xs:element>
-	<xs:element name="Atributos">
-		<xs:complexType>
-			<xs:all>
-				<xs:element ref="IdPeticion"/>
-				<xs:element ref="NumElementos"/>
-				<xs:element ref="TimeStamp"/>
-				<xs:element ref="Estado" minOccurs="0"/>
-				<xs:element ref="CodigoCertificado"/>
-			</xs:all>
-		</xs:complexType>
-	</xs:element>
+<xs:schema 
+  xmlns="http://www.map.es/xml-schemas/respuesta"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns1="http://www.map.es/xml-schemas/respuesta/datosespecificos"
+  targetNamespace="http://www.map.es/xml-schemas/respuesta"
+  elementFormDefault="qualified" 
+  attributeFormDefault="unqualified">
+
+  <xs:import 
+    namespace="http://www.map.es/xml-schemas/respuesta/datosespecificos" 
+    schemaLocation="datos-especificos-respuesta.xsd"/>
+
+  <xs:element name="Apellido1">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:maxLength value="40"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+
+  <xs:element name="Apellido2">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:maxLength value="40"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+
+  <xs:element name="Atributos">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="IdPeticion"/>
+        <xs:element ref="NumElementos"/>
+        <xs:element ref="TimeStamp"/>
+        <xs:element ref="Estado" minOccurs="0"/>
+        <xs:element ref="CodigoCertificado"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
 	<xs:element name="CodigoCertificado">
 		<xs:simpleType>
 			<xs:restriction base="xs:string">
@@ -335,3 +347,4 @@ Las transmisiones son opcionales en caso de devolver en la respuesta un nuevo TE
 		</xs:complexType>
 	</xs:element>
 </xs:schema>
+
