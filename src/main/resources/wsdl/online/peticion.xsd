@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- editado con XMLSpy v2015 (http://www.altova.com) por EJIE, S.A. (EJIE, S.A.) -->
+
 <xs:schema
-  targetNamespace="http://intermediacion.redsara.es/scsp/esquemas/ittaxtela/online/peticion"
-  xmlns="http://intermediacion.redsara.es/scsp/esquemas/ittaxtela/online/peticion"
+  targetNamespace="http://www.map.es/xml-schemas/peticion"
+  xmlns="http://www.map.es/xml-schemas/peticion"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:ns1="http://intermediacion.redsara.es/scsp/esquemas/ittaxtela/online/peticion/datosespecificos"
+  xmlns:ns1="http://www.map.es/xml-schemas/peticion/datosespecificos"
   elementFormDefault="qualified">
+
+  
 <xs:import
-  namespace="http://intermediacion.redsara.es/scsp/esquemas/ittaxtela/online/peticion/datosespecificos"
+  namespace="http://www.map.es/xml-schemas/peticion/datosespecificos"
   schemaLocation="datos-especificos-peticion.xsd"/>
+
+
 
 	<xs:element name="Apellido1">
 		<xs:simpleType>
@@ -342,4 +347,9 @@ Las transmisiones son opcionales en caso de devolver en la respuesta un nuevo TE
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
+	
+	
+	
+	
+	
 </xs:schema>
