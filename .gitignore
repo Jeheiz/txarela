@@ -1,8 +1,21 @@
-# Ignorar carpeta target (Maven)
+# Carpetas de compilación y artefactos Maven
 target/
+bin/
+build/
+out/
+generated/
+target/generated-sources/
+target/generated-test-sources/
 
-# Ignorar archivos de configuración de Eclipse
+# Archivos de configuración de Eclipse/STS
 .classpath
 .project
 .factorypath
 .settings/
+
+# Logs
+*.log
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
