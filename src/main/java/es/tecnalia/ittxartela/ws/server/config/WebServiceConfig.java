@@ -48,8 +48,8 @@ public class WebServiceConfig {
     Endpoint itTxartelaOnlineServiceEndpoint(Bus bus, IntermediacionOnlinePortType service) {
     	log.info("Se procede a crear el servicio sync");
         EndpointImpl endpoint = new EndpointImpl(bus, service);
-        endpoint.publish("/ittxartela/online");
-        endpoint.setWsdlLocation("classpath:/wsdl/online/x53jiServicioIntermediacion.wsdl");
+        endpoint.publish("/online");
+        endpoint.setWsdlLocation("classpath:wsdl/online/x53jiServicioIntermediacion.wsdl");
 /*
         endpoint.setProperties(Map.of(
         	"schema-validation-enabled", true,

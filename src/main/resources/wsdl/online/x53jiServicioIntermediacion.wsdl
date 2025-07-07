@@ -35,8 +35,8 @@
 		</operation>
 	</binding>
 	<service name="x53jiServicioOnlineIntermediacion">
-		<port name="IntermediacionOnlinePort" binding="tns:IntermediacionOnlinePortBinding">
-			<soap:address location="http://10.136.100.80:7001/x53jiServicesWar/x53jiServicioIntermediacion"/>
-		</port>
+  <port name="IntermediacionOnlinePort" binding="tns:IntermediacionOnlinePortBinding">
+    <soap:address location="http://localhost:8080/ittxartela/online"/>
+  </port>
 	</service>
 </definitions>
