@@ -25,6 +25,8 @@
         <cxf.version>3.5.8</cxf.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+          <maven.compiler.source>11</maven.compiler.source>
+          <maven.compiler.target>11</maven.compiler.target>
     </properties>
     <dependencies>
 		<dependency>
@@ -128,10 +130,15 @@
 
       <build>
         <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-            </resource>
+              <resource>
+    <directory>src/main/resources</directory>
+    <includes>
+      <include>**/*.wsdl</include>
+      <include>**/*.xsd</include>
+      <include>**/*.properties</include>
+    </includes>
+    <filtering>false</filtering>
+  </resource>
         </resources>
       <plugins>
     <plugin>
@@ -170,8 +177,8 @@
                     <sourceRoot>${project.build.directory}/generated-sources/cxf</sourceRoot>
                     <wsdlOptions>
                         <wsdlOption>
-                            <wsdl>${project.basedir}/src/main/resources/wsdl/online/x53jiServicioIntermediacion.wsdl</wsdl>
-                            <wsdlLocation>classpath:wsdl/online/x53jiServicioIntermediacion.wsdl</wsdlLocation>
+                             <wsdl>src/main/resources/wsdl/online/x53jiServicioIntermediacion.wsdl</wsdl>
+                              <wsdlLocation>classpath:wsdl/online/x53jiServicioIntermediacion.wsdl</wsdlLocation>
                             <extraargs>
                                 <extraarg>-validate</extraarg>
                                 <extraarg>-exsh</extraarg>
