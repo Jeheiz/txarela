@@ -52,12 +52,28 @@ public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType
 	@Autowired
 	private MatriculaRepository matriculaRepository;
 
+	 @Autowired
+        private AuditRepository auditRepository;
+
 	@Override
 	public Respuesta peticionSincrona(Peticion peticion) {
 
 		log.info("peticionSincrona recibida {}", XmlUtil.toXml(peticion));
 
 		Respuesta respuesta = new Respuesta();
+
+		   public Respuesta peticionSincrona(Peticion peticion) {
+
+                log.info("peticionSincrona recibida {}", XmlUtil.toXml(peticion));
+
+                String idPeticion = peticion.getAtributos().getIdPeticion();
+               
+                Audit audit = new Audit();
+                audit.setIdPeticion(idPeticion);
+                audit.setXmlPeticion(XmlUtil.toXml(peticion));
+                audit = auditRepository.save(audit);
+
+                Respuesta respuesta = new Respuesta();
 
 		mapper.map(peticion, respuesta);
 
@@ -84,9 +100,12 @@ public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType
 
 		}
 
-		log.info("peticionSincrona respuesta generada {}", XmlUtil.toXml(respuesta));
+		 audit.setXmlRespuesta(XmlUtil.toXml(respuesta));
+                auditRepository.save(audit);
 
-		return respuesta;
+                log.info("peticionSincrona respuesta generada {}", XmlUtil.toXml(respuesta));
+
+                return respuesta;
 	}
 
 	private DatosEspecificosOnlineRespuestaItTxartela createDatosEspecificosRespuesta(Peticion peticion) {
