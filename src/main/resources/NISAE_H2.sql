@@ -16,6 +16,15 @@
 --CREATE DATABASE IF NOT EXISTS `itcard20db` /*!40100 DEFAULT CHARACTER SET latin1 */;
 --USE `itcard20db`;
 
+CREATE TABLE audit (
+    id IDENTITY PRIMARY KEY,
+    id_peticion VARCHAR(255),
+    xml_peticion CLOB,
+    xml_respuesta CLOB
+);
+
+
+
 -- Volcando estructura para tabla itcard20db.alumnos
 CREATE TABLE alumnos (
     dni VARCHAR(255) PRIMARY KEY,
