@@ -153,3 +153,30 @@ INSERT INTO `matricula` (`cod_centro`, `dni`, `cod_modulo`, `username`, `passwor
 INSERT INTO `matricula` (`cod_centro`, `dni`, `cod_modulo`, `username`, `password`, `num_conv`, `fecha_matr`, `num_envios_metaposta`, `fecha_exam`, `hora_exam`, `intentos`, `ip`, `id_status`, `prueba_cerrada`, `id_nivel`, `num_correctas`, `num_incorrectas`, `acg1`, `acg2`, `acg3`, `comunicacion_alternativo`, `asistencia_especial`, `useragent`, `hora_inicio_examen`, `hora_fin_examen`, `examen_invidentes`, `activo`, `id_origen`, `idSesion`, `plataforma`, `viejaConvocatoria`, `resp1`, `resp2`, `resp3`, `tiempo`, `created`, `updated`, `idioma`) VALUES (103, '16054223Q', 52, 'uusuarioprueba1', '1319066318', 0, '2010-07-26', '0', '2012-07-03', '16:00', '0', '', 1, -1, 1, 0, 0, 0, 0, 0, 0, 0, '', '', '00:00', 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL, NULL, '1970-01-01 00:00:00', '2012-07-05 11:29:43', '0');
 INSERT INTO `matricula` (`cod_centro`, `dni`, `cod_modulo`, `username`, `password`, `num_conv`, `fecha_matr`, `num_envios_metaposta`, `fecha_exam`, `hora_exam`, `intentos`, `ip`, `id_status`, `prueba_cerrada`, `id_nivel`, `num_correctas`, `num_incorrectas`, `acg1`, `acg2`, `acg3`, `comunicacion_alternativo`, `asistencia_especial`, `useragent`, `hora_inicio_examen`, `hora_fin_examen`, `examen_invidentes`, `activo`, `id_origen`, `idSesion`, `plataforma`, `viejaConvocatoria`, `resp1`, `resp2`, `resp3`, `tiempo`, `created`, `updated`, `idioma`) VALUES (2, '16054223Q', 1, 'uusuarioprueba1', '1660589964', 0, '2010-10-04', '0', '2012-07-03', '10:00', '0', '', 1, -1, 1, 0, 0, 0, 0, 0, 0, 0, '', '', '00:00', 0, 0, 0, NULL, 0, NULL, NULL, NULL, NULL, NULL, '1970-01-01 00:00:00', '2012-07-05 11:29:43', '0');
 INSERT INTO `matricula` (`cod_centro`, `dni`, `cod_modulo`, `username`, `password`, `num_conv`, `fecha_matr`, `num_envios_metaposta`, `fecha_exam`, `hora_exam`, `intentos`, `ip`, `id_status`, `prueba_cerrada`, `id_nivel`, `num_correctas`, `num_incorrectas`, `acg1`, `acg2`, `acg3`, `comunicacion_alternativo`, `asistencia_especial`, `useragent`, `hora_inicio_examen`, `hora_fin_examen`, `examen_invidentes`, `activo`, `id_origen`, `idSesion`, `plataforma`, `viejaConvocatoria`, `resp1`, `resp2`, `resp3`, `tiempo`, `created`, `updated`, `idioma`) VALUES (2, '16054223Q', 130, 'uusuarioprueba1', '1177069924', 0, '2010-11-24', '0', '2012-07-03', '10:00', '0', '', 1, -1, 1, 0, 0, 0, 0, 0, 0, 0, '', '', '00:00', 0, 0, 0, NULL, 0, NULL, NULL, NULL, NULL, NULL, '1970-01-01 00:00:00', '2019-11-28 11:37:12', '0');
+
+
+CREATE TABLE `async_peticion` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`id_peticion` VARCHAR(255) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`xml_peticion` TEXT(65535) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`xml_respuesta` TEXT(65535) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`estado` VARCHAR(20) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`ter` INT(11) NULL DEFAULT NULL,
+	PRIMARY KEY (`id`) USING BTREE)
+    
+COLLATE='latin1_swedish_ci'
+ENGINE=InnoDB
+AUTO_INCREMENT=9
+;
+ 
+CREATE TABLE `audit` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`id_peticion` VARCHAR(255) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`xml_peticion` TEXT(65535) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`xml_respuesta` TEXT(65535) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	PRIMARY KEY (`id`) USING BTREE)
+    
+COLLATE='latin1_swedish_ci'
+ENGINE=InnoDB
+AUTO_INCREMENT=38
+;
