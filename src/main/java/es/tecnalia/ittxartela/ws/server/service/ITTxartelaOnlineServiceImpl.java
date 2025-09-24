@@ -1,4 +1,4 @@
-package es.tecnalia.ittxartela.ws.server.service;
+ackage es.tecnalia.ittxartela.ws.server.service;
 
 import java.sql.Date;
 import java.text.ParseException;
@@ -27,6 +27,11 @@ import es.redsara.intermediacion.scsp.esquemas.v3.online.respuesta.Respuesta;
 import es.tecnalia.ittxartela.ws.server.constant.EstadoEspecifico;
 import es.tecnalia.ittxartela.ws.server.model.Matricula;
 import es.tecnalia.ittxartela.ws.server.repository.MatriculaRepository;
+import es.tecnalia.ittxartela.ws.server.constant.EstadoEspecifico;
+import es.tecnalia.ittxartela.ws.server.model.Matricula;
+import es.tecnalia.ittxartela.ws.server.model.Audit;
+import es.tecnalia.ittxartela.ws.server.repository.MatriculaRepository;
+import es.tecnalia.ittxartela.ws.server.repository.AuditRepository;
 import es.tecnalia.ittxartela.ws.server.util.PeticionUtils;
 import es.tecnalia.ittxartela.ws.server.util.PeticionValidator;
 import es.tecnalia.ittxartela.ws.server.util.Utils;
@@ -51,64 +56,102 @@ public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType
 
 	@Autowired
 	private MatriculaRepository matriculaRepository;
+	
 
-	 @Autowired
-        private AuditRepository auditRepository;
+    @Autowired
+    private AuditRepository auditRepository;
 
-	@Override
-	public Respuesta peticionSincrona(Peticion peticion) {
+    @Override
+    public Respuesta peticionSincrona(Peticion peticion) {
 
-		log.info("peticionSincrona recibida {}", XmlUtil.toXml(peticion));
+            log.info("peticionSincrona recibida {}", XmlUtil.toXml(peticion));
+            System.out.println("peticionSincrona recibida {}:" + XmlUtil.toXml(peticion));
 
-		Respuesta respuesta = new Respuesta();
+            Respuesta respuesta = new Respuesta();
+            mapper.map(peticion, respuesta);
 
-		   public Respuesta peticionSincrona(Peticion peticion) {
+            String idPeticion = peticion != null && peticion.getAtributos() != null
+                            ? peticion.getAtributos().getIdPeticion()
+                            : null;
+            
+            System.out.println(">>>GRABAMOS EN AUDIT LA PETICION:"+idPeticion);
 
-                log.info("peticionSincrona recibida {}", XmlUtil.toXml(peticion));
+            Audit audit = new Audit();
+            audit.setIdPeticion(idPeticion);
+            audit.setXmlPeticion(XmlUtil.toXml(peticion));
+            audit = auditRepository.save(audit);
 
-                String idPeticion = peticion.getAtributos().getIdPeticion();
-               
-                Audit audit = new Audit();
-                audit.setIdPeticion(idPeticion);
-                audit.setXmlPeticion(XmlUtil.toXml(peticion));
-                audit = auditRepository.save(audit);
+            Optional<PeticionValidator.RespuestaError> error;
+            if (peticion == null || peticion.getAtributos() == null || idPeticion == null) {
+            	    System.out.println("0401 - La estructura del fichero recibido no corresponde con el esquema");
+                    error = Optional.of(new PeticionValidator.RespuestaError(
+                                    "0401",
+                                    "La estructura del fichero recibido no corresponde con el esquema."));
+            } else {
+            	    System.out.println("Llamada a peticionValidator con la petición");
+                    error = peticionValidator.validar(peticion);
+            }
+            
+            System.out.println(">>>ASIGNAMOS CIERTOS ATRIBUTOS A LA RESPUESTA");
 
-                Respuesta respuesta = new Respuesta();
+            if (respuesta.getAtributos() == null) {
+                    respuesta.setAtributos(new es.redsara.intermediacion.scsp.esquemas.v3.online.respuesta.Atributos());
+            }
+            if (respuesta.getAtributos().getEstado() == null) {
+                    respuesta.getAtributos().setEstado(new es.redsara.intermediacion.scsp.esquemas.v3.online.respuesta.Estado());
+            }
 
-		mapper.map(peticion, respuesta);
+            if (error.isPresent()) {
+            	
+            	    System.out.println("Hay error presente");
+
+                    respuesta.getAtributos().getEstado().setCodigoEstado(error.get().getCodigo());
+                    respuesta.getAtributos().getEstado().setLiteralError(error.get().getMensaje());
+                    respuesta.getAtributos().setTimeStamp(XmlUtil.obtenerFechaHoraXml());
+                    if (respuesta.getTransmisiones() != null &&
+                        respuesta.getTransmisiones().getTransmisionDatos() != null &&
+                        !respuesta.getTransmisiones().getTransmisionDatos().isEmpty()) {
+                            respuesta.getTransmisiones().getTransmisionDatos().get(0)
+                                    .getDatosGenericos().getTransmision()
+                                    .setFechaGeneracion(XmlUtil.obtenerFechaHoraXml());
+                    }
+            } else {
+            	
+            	   System.out.println("No hay error presente");
+
+                    respuesta.getAtributos().getEstado().setCodigoEstado("0003");
+                    respuesta.getAtributos().getEstado().setLiteralError("Tramitada correctamente");
+                    respuesta.getAtributos().setTimeStamp(XmlUtil.obtenerFechaHoraXml());
+                    if (respuesta.getTransmisiones() != null &&
+                        respuesta.getTransmisiones().getTransmisionDatos() != null &&
+                        !respuesta.getTransmisiones().getTransmisionDatos().isEmpty()) {
+                            respuesta.getTransmisiones().getTransmisionDatos().get(0)
+                                    .getDatosGenericos().getTransmision()
+                                    .setFechaGeneracion(XmlUtil.obtenerFechaHoraXml());
+
+                            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                            System.out.println(">>>DatosEspecificosOnlineRespuestaItTxartela.createDatosEspecificosRespuesta<<<");
+                            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                            DatosEspecificosOnlineRespuestaItTxartela datosEspecificos = createDatosEspecificosRespuesta(peticion);
+                            respuesta.getTransmisiones().getTransmisionDatos().get(0)
+                                    .setDatosEspecificos(datosEspecificos);
+                    }
+
+            }
 
 
-		// Validación de la petición
-		Optional<PeticionValidator.RespuestaError> error = peticionValidator.validar(peticion);
+           System.out.println(">>>GRABAMOS EN AUDIT LA RESPUESTA:"+XmlUtil.toXml(respuesta));
+	       audit.setXmlRespuesta(XmlUtil.toXml(respuesta));
+           auditRepository.save(audit);
 
-		if (error.isPresent()) {
+           log.info("peticionSincrona respuesta generada {}", XmlUtil.toXml(respuesta));
 
-			respuesta.getAtributos().getEstado().setCodigoEstado(error.get().getCodigo());
-			respuesta.getAtributos().getEstado().setLiteralError(error.get().getMensaje());
-			respuesta.getAtributos().setTimeStamp(XmlUtil.obtenerFechaHoraXml());
-			respuesta.getTransmisiones().getTransmisionDatos().get(0).getDatosGenericos().getTransmision().setFechaGeneracion(XmlUtil.obtenerFechaHoraXml());
-		} else {
-
-			respuesta.getAtributos().getEstado().setCodigoEstado("0003");
-			respuesta.getAtributos().getEstado().setLiteralError("Tramitada correctamente");
-			respuesta.getAtributos().setTimeStamp(XmlUtil.obtenerFechaHoraXml());
-			respuesta.getTransmisiones().getTransmisionDatos().get(0).getDatosGenericos().getTransmision().setFechaGeneracion(XmlUtil.obtenerFechaHoraXml());
-
-			DatosEspecificosOnlineRespuestaItTxartela datosEspecificos = createDatosEspecificosRespuesta(peticion);
-
-			respuesta.getTransmisiones().getTransmisionDatos().get(0).setDatosEspecificos(datosEspecificos);
-
-		}
-
-		 audit.setXmlRespuesta(XmlUtil.toXml(respuesta));
-                auditRepository.save(audit);
-
-                log.info("peticionSincrona respuesta generada {}", XmlUtil.toXml(respuesta));
-
-                return respuesta;
+           return respuesta;
 	}
 
 	private DatosEspecificosOnlineRespuestaItTxartela createDatosEspecificosRespuesta(Peticion peticion) {
+		
+		System.out.println("#####Entra en createDatosEspecificosRespuesta#####");
 
 		log.info("Identificadores de documento solicitados {}", PeticionUtils.extraerDocumentacionTitulares(peticion));
 		log.info("Titulares sin documento solicitados {}", PeticionUtils.extraerTitularesSinDocumentacion(peticion));
@@ -125,24 +168,48 @@ public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType
 		estado.setDescripcion(EstadoEspecifico.DATA_NOT_FOUND.getDescripcion());
 
 		Optional<EstadoResultado> estadoValidacion = validarDatosEspecificos(datosEspecificosPeticion);
+		
+		System.out.println("Comprobamos estadoValidacion");
 
 		if (estadoValidacion.isEmpty()) {
+			
+			System.out.println("estadoValidacion vacío");
 
 			java.sql.Date fechaLimite = null;
 
 			try {
 
 				fechaLimite = PeticionUtils.extraerFechaLimite(datosEspecificosPeticion);
+				System.out.println("fecha límite obtenida:"+fechaLimite);
 			} catch (ParseException e) {
 				//Nunca debe darse porque la fecha esta previamente validada
 				e.printStackTrace();
 			}
+			
+			System.out.println("Obtenemos las matrículas hechas y aprobadas para la fecha:"+fechaLimite+ "y la docu:"+datosEspecificosPeticion.getDocumentacion()+ " y el tipo de certificación:"+datosEspecificosPeticion.getTipoCertificacion());
 				
-			List<Matricula> matriculas = obtenerExamenesRealizadosYSuperados(
-						datosEspecificosPeticion.getDocumentacion(), 
-						datosEspecificosPeticion.getTipoCertificacion(),
-						fechaLimite
-						);
+			//Cambio para contemplar peticiones tipo AMBOS
+			
+			List<Matricula> matriculas = null;
+			
+			if (datosEspecificosPeticion.getTipoCertificacion()!=2) {
+			
+				matriculas = obtenerExamenesRealizadosYSuperados(
+							datosEspecificosPeticion.getDocumentacion(), 
+							datosEspecificosPeticion.getTipoCertificacion(),
+							fechaLimite
+							);
+			
+			}else {
+				
+				matriculas = obtenerExamenesRealizadosYSuperadosAmbos(
+							datosEspecificosPeticion.getDocumentacion(),
+							fechaLimite
+							);
+				
+			}
+			
+			System.out.println("cantidad de certificaciones encontradas:"+matriculas.size());
 
 			if (matriculas.size() > 0) {
 
@@ -151,9 +218,13 @@ public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType
 				estado.setDescripcion(EstadoEspecifico.OK.getDescripcion());
 			}
 		} else {
+			
+			System.out.println("estadoValidacion no vacío");
 
 			estado = estadoValidacion.get();
 		}
+		
+		System.out.println("Retorno y trazas");
 
 		Retorno retorno = new Retorno();
 
@@ -166,8 +237,14 @@ public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType
 		retorno.setEstadoResultado(estado);
 
 		if (personas != null) {
-
+			
+			System.out.println("Personas NO null");
 			retorno.setPersonas(personas);
+			
+		}else {
+			
+			System.out.println("Personas null");
+			
 		}
 
 		datosEspecificos.setRetorno(retorno);
@@ -176,6 +253,8 @@ public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType
 	}
 
 	public Personas extraerDatosPersonas(List<Matricula> matriculas) {
+		
+		System.out.println("Entra en extraerDatosPersonas");
 
 		Personas personas = new Personas();
 		Persona personaActual = null;
@@ -210,6 +289,8 @@ public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType
 
 	private Optional<EstadoResultado> validarDatosEspecificos(
 			DatosEspecificosOnlinePeticionItTxartela datosEspecificosPeticion) {
+		
+		System.out.println("Entra en validarDatosEspecificos");
 
 		boolean esDniValido = Utils.esDNIValido(datosEspecificosPeticion.getDocumentacion());
 
@@ -235,8 +316,18 @@ public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType
 	}
 
 	private List<Matricula> obtenerExamenesRealizadosYSuperados(String dni, Integer plataforma, Date fecha) {
+		
+		System.out.println("IMPL: "+"dni:"+dni+" plataforma:"+plataforma+" fecha:"+fecha);
 
 		return matriculaRepository.findExamenesRealizadosYSuperados(dni, plataforma, fecha);
 	}
+	
+	//Para consultas donde nos pidan ambas certificaciones
+	private List<Matricula> obtenerExamenesRealizadosYSuperadosAmbos(String dni, Date fecha) {
+			
+			System.out.println("IMPL: "+"dni:"+dni+" fecha:"+fecha);
+	
+			return matriculaRepository.findExamenesRealizadosYSuperadosAmbos(dni, fecha);
+		}
 
 }
