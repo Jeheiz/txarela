@@ -26,6 +26,8 @@ import es.redsara.intermediacion.scsp.esquemas.datosespecificos.Personas;
 import es.redsara.intermediacion.scsp.esquemas.datosespecificos.Retorno;
 import es.redsara.intermediacion.scsp.esquemas.datosespecificos.Traza;
 import es.redsara.intermediacion.scsp.esquemas.v3.online.peticion.Peticion;
+import es.redsara.intermediacion.scsp.esquemas.v3.online.respuesta.Atributos;
+import es.redsara.intermediacion.scsp.esquemas.v3.online.respuesta.Estado;
 import es.redsara.intermediacion.scsp.esquemas.v3.online.respuesta.Respuesta;
 import es.tecnalia.ittxartela.ws.server.constant.EstadoEspecifico;
 import es.tecnalia.ittxartela.ws.server.constant.EstadoPeticionAsincrona;
@@ -85,6 +87,7 @@ public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType
                 return respuesta;
         }
 
+        @Override
         @Transactional
         public Respuesta peticionAsincrona(Peticion peticion) {
 
@@ -97,6 +100,7 @@ public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType
 
                         Respuesta respuestaError = construirRespuestaBase(peticion);
                         aplicarError(respuestaError, error.get());
+                        asegurarEstado(respuestaError).setTiempoEstimadoRespuesta(0);
 
                         audit.setMensajeEstado(String.format("Petición rechazada: %s", error.get().getMensaje()));
                         audit.setDetalleError(error.get().getMensaje());
@@ -116,8 +120,10 @@ public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType
                                                 );
 
                 Respuesta respuesta = construirRespuestaBase(peticion);
-                respuesta.getAtributos().getEstado().setCodigoEstado(EstadoPeticionAsincrona.RECIBIDA.getCodigo());
-                respuesta.getAtributos().getEstado().setLiteralError(EstadoPeticionAsincrona.RECIBIDA.getDescripcion());
+                Estado estado = asegurarEstado(respuesta);
+                estado.setCodigoEstado(EstadoPeticionAsincrona.RECIBIDA.getCodigo());
+                estado.setLiteralError(EstadoPeticionAsincrona.RECIBIDA.getDescripcion());
+                establecerTiempoEstimadoRespuesta(estado, TIEMPO_RESPUESTA_POR_DEFECTO);
 
                 asegurarTransmisionDatos(respuesta).setDatosEspecificos(crearDatosEstado(peticion, audit));
 
@@ -159,8 +165,20 @@ public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType
                 }
         }
 
-        @Transactional(readOnly = true)
-        public Respuesta consultarPeticionAsincrona(String idPeticion) {
+        @Override
+        @Transactional
+        public Respuesta consultarPeticionAsincrona(Peticion peticionConsulta) {
+
+                log.info("consultarPeticionAsincrona recibida {}",
+                                peticionConsulta != null ? XmlUtil.toXml(peticionConsulta) : "<peticion nula>");
+
+                if (peticionConsulta == null || peticionConsulta.getAtributos() == null
+                                || peticionConsulta.getAtributos().getIdPeticion() == null
+                                || peticionConsulta.getAtributos().getIdPeticion().isBlank()) {
+                        throw new IllegalArgumentException("El identificador de petición es obligatorio");
+                }
+
+                String idPeticion = peticionConsulta.getAtributos().getIdPeticion();
 
                 Audit audit = auditRepository.findTopByIdPeticionOrderByIdDesc(idPeticion);
 
@@ -178,10 +196,20 @@ public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType
 
                 Peticion peticion = XmlUtil.fromXml(audit.getXmlPeticion(), Peticion.class);
                 Respuesta respuesta = construirRespuestaBase(peticion);
-                respuesta.getAtributos().getEstado().setCodigoEstado(audit.getEstado());
-                respuesta.getAtributos().getEstado().setLiteralError(audit.getMensajeEstado());
+                Estado estado = asegurarEstado(respuesta);
+                estado.setCodigoEstado(audit.getEstado());
+                estado.setLiteralError(audit.getMensajeEstado());
+                if (EstadoPeticionAsincrona.RECIBIDA.matches(audit.getEstado())) {
+                        establecerTiempoEstimadoRespuesta(estado,
+                                        Duration.between(LocalDateTime.now(), audit.getFechaRespuestaPrevista()));
+                } else {
+                        estado.setTiempoEstimadoRespuesta(0);
+                }
 
                 asegurarTransmisionDatos(respuesta).setDatosEspecificos(crearDatosEstado(peticion, audit));
+
+                audit.setXmlRespuesta(XmlUtil.toXml(respuesta));
+                auditRepository.save(audit);
 
                 return respuesta;
         }
@@ -205,7 +233,8 @@ public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType
                 Respuesta respuesta = new Respuesta();
                 mapper.map(peticion, respuesta);
 
-                respuesta.getAtributos().setTimeStamp(XmlUtil.obtenerFechaHoraXml());
+                asegurarAtributos(respuesta).setTimeStamp(XmlUtil.obtenerFechaHoraXml());
+                asegurarEstado(respuesta);
 
                 es.redsara.intermediacion.scsp.esquemas.v3.online.respuesta.TransmisionDatos transmision = asegurarTransmisionDatos(respuesta);
 
@@ -240,14 +269,18 @@ public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType
 
         private void aplicarError(Respuesta respuesta, PeticionValidator.RespuestaError error) {
 
-                respuesta.getAtributos().getEstado().setCodigoEstado(error.getCodigo());
-                respuesta.getAtributos().getEstado().setLiteralError(error.getMensaje());
+                Estado estado = asegurarEstado(respuesta);
+                estado.setCodigoEstado(error.getCodigo());
+                estado.setLiteralError(error.getMensaje());
+                estado.setTiempoEstimadoRespuesta(0);
         }
 
         private void aplicarRespuestaCorrecta(Peticion peticion, Respuesta respuesta) {
 
-                respuesta.getAtributos().getEstado().setCodigoEstado("0003");
-                respuesta.getAtributos().getEstado().setLiteralError("Tramitada correctamente");
+                Estado estado = asegurarEstado(respuesta);
+                estado.setCodigoEstado("0003");
+                estado.setLiteralError("Tramitada correctamente");
+                estado.setTiempoEstimadoRespuesta(0);
 
                 asegurarTransmisionDatos(respuesta).setDatosEspecificos(createDatosEspecificosRespuesta(peticion));
         }
@@ -301,6 +334,39 @@ public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType
                 }
 
                 return descripcion.toString();
+        }
+
+        private Atributos asegurarAtributos(Respuesta respuesta) {
+
+                if (respuesta.getAtributos() == null) {
+                        respuesta.setAtributos(new Atributos());
+                }
+
+                return respuesta.getAtributos();
+        }
+
+        private Estado asegurarEstado(Respuesta respuesta) {
+
+                Atributos atributos = asegurarAtributos(respuesta);
+
+                if (atributos.getEstado() == null) {
+                        atributos.setEstado(new Estado());
+                }
+
+                return atributos.getEstado();
+        }
+
+        private void establecerTiempoEstimadoRespuesta(Estado estado, Duration duracion) {
+
+                if (duracion == null) {
+                        estado.setTiempoEstimadoRespuesta(null);
+                        return;
+                }
+
+                Duration restante = duracion.isNegative() ? Duration.ZERO : duracion;
+                long dias = restante.toDays();
+                int valor = dias > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) dias;
+                estado.setTiempoEstimadoRespuesta(valor);
         }
 
         private DatosEspecificosItTxartela obtenerDatosEspecificosPeticion(Peticion peticion) {

@@ -9,34 +9,33 @@
 
     <!-- Import único y limpio -->
     <xs:import 
-        namespace="http://intermediacion.redsara.es/scsp/esquemas/datosespecificos" 
-        schemaLocation="datos-especificos.xsd"/>
+          namespace="http://intermediacion.redsara.es/scsp/esquemas/datosespecificos" 
+    schemaLocation="datos-especificos.xsd"/>
 
-    <!-- Definiciones -->
-    <xs:element name="Apellido1">
-        <xs:simpleType>
-            <xs:restriction base="xs:string">
-                <xs:maxLength value="40"/>
-            </xs:restriction>
-        </xs:simpleType>
-    </xs:element>
+  <xs:element name="Apellido1">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:maxLength value="40"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
 
-    <xs:element name="Apellido2">
-        <xs:simpleType>
-            <xs:restriction base="xs:string">
-                <xs:maxLength value="40"/>
-            </xs:restriction>
-        </xs:simpleType>
-    </xs:element>
+  <xs:element name="Apellido2">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:maxLength value="40"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
 
-    <xs:element name="Atributos">
-        <xs:complexType>
-            <xs:all>
-                <xs:element name="IdPeticion" type="xs:string"/>
-                <xs:element name="NumElementos" type="xs:int"/>
-                <xs:element name="TimeStamp" type="xs:string"/>
-                <xs:element name="Estado" minOccurs="0"/>
-                <xs:element name="CodigoCertificado" type="xs:string"/>
+  <xs:element name="Atributos">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="IdPeticion"/>
+        <xs:element ref="NumElementos"/>
+        <xs:element ref="TimeStamp"/>
+        <xs:element ref="Estado" minOccurs="0"/>
+        <xs:element ref="CodigoCertificado"/>
             </xs:all>
         </xs:complexType>
     </xs:element>
