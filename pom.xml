@@ -171,7 +171,7 @@
     <artifactId>cxf-codegen-plugin</artifactId>
     <version>${cxf.version}</version>
     <executions>
-        <execution>
+     <execution>
                 <id>generate-sources</id>
                 <phase>generate-sources</phase>
                 <goals>
@@ -185,7 +185,8 @@
                             <wsdlLocation>classpath:wsdl/online/x53jiServicioIntermediacion.wsdl</wsdlLocation>
                             <extraargs>
                                 <extraarg>-validate</extraarg>
-                                <extraarg>-exsh=true</extraarg>
+                                <extraarg>-exsh</extraarg>
+                                <extraarg>true</extraarg>
                             </extraargs>
                         </wsdlOption>
                     </wsdlOptions>
