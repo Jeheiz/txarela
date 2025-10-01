@@ -1,5 +1,5 @@
 
-package es.redsara.intermediacion.scsp.esquemas.ittaxtela.online.respuesta.datosespecificos;
+package es.redsara.intermediacion.scsp.esquemas.datosespecificos;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -18,8 +18,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;all&gt;
- *         &lt;element name="CodigoModulo" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *         &lt;element name="FechaExamen" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *         &lt;element name="Documentacion" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element ref="{http://intermediacion.redsara.es/scsp/esquemas/ittaxtela/online/respuesta/datosespecificos}Certificados" minOccurs="0"/&gt;
  *       &lt;/all&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -32,60 +32,60 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "", propOrder = {
 
 })
-@XmlRootElement(name = "Certificado")
-public class Certificado {
+@XmlRootElement(name = "Persona")
+public class Persona {
 
-    @XmlElement(name = "CodigoModulo", required = true)
-    protected String codigoModulo;
-    @XmlElement(name = "FechaExamen")
-    protected String fechaExamen;
+    @XmlElement(name = "Documentacion", required = true)
+    protected String documentacion;
+    @XmlElement(name = "Certificados")
+    protected Certificados certificados;
 
     /**
-     * Obtiene el valor de la propiedad codigoModulo.
+     * Obtiene el valor de la propiedad documentacion.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getCodigoModulo() {
-        return codigoModulo;
+    public String getDocumentacion() {
+        return documentacion;
     }
 
     /**
-     * Define el valor de la propiedad codigoModulo.
+     * Define el valor de la propiedad documentacion.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setCodigoModulo(String value) {
-        this.codigoModulo = value;
+    public void setDocumentacion(String value) {
+        this.documentacion = value;
     }
 
     /**
-     * Obtiene el valor de la propiedad fechaExamen.
+     * Obtiene el valor de la propiedad certificados.
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link Certificados }
      *     
      */
-    public String getFechaExamen() {
-        return fechaExamen;
+    public Certificados getCertificados() {
+        return certificados;
     }
 
     /**
-     * Define el valor de la propiedad fechaExamen.
+     * Define el valor de la propiedad certificados.
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link Certificados }
      *     
      */
-    public void setFechaExamen(String value) {
-        this.fechaExamen = value;
+    public void setCertificados(Certificados value) {
+        this.certificados = value;
     }
 
 }

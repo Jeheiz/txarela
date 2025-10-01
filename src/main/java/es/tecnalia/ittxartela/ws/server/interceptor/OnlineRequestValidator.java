@@ -34,114 +34,176 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class OnlineRequestValidator extends AbstractPhaseInterceptor<Message> {
 
-    private final Schema schema;
+	private final Schema schema;
 
-    public OnlineRequestValidator() throws Exception {
-        super(Phase.RECEIVE);
-        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+	public OnlineRequestValidator() throws Exception {
+		super(Phase.RECEIVE);
+		SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
-        factory.setResourceResolver(new ClasspathResourceResolver());
+		factory.setResourceResolver(new ClasspathResourceResolver());
 
-        InputStream xsdStream = getClass().getClassLoader().getResourceAsStream("wsdl/online/peticion.xsd");
-        if (xsdStream == null) {
-            throw new IllegalArgumentException("No se encontró el archivo XSD");
-        }
-        this.schema = factory.newSchema(new StreamSource(xsdStream));
-    }
+		InputStream xsdStream = getClass().getClassLoader().getResourceAsStream("wsdl/online/peticion.xsd");
+		if (xsdStream == null) {
+			throw new IllegalArgumentException("No se encontró el archivo XSD");
+		}
+		this.schema = factory.newSchema(new StreamSource(xsdStream));
+	}
 
-    @Override
-    public void handleMessage(Message message) throws Fault {
-        try {
-            InputStream originalStream = message.getContent(InputStream.class);
-            if (originalStream == null) {
-                throw new Fault(new IllegalArgumentException("El InputStream del mensaje SOAP es nulo"));
-            }
+	@Override
+	public void handleMessage(Message message) throws Fault {
+		// 1️⃣ Filtrar GET para permitir ?wsdl y descargas
+		String httpMethod = (String) message.get(Message.HTTP_REQUEST_METHOD);
+		if ("GET".equalsIgnoreCase(httpMethod)) {
+			// No validamos los GET (como ?wsdl)
+			return;
+		}
 
-            byte[] soapBytes = IOUtils.readBytesFromStream(originalStream);
+		try {
+			InputStream originalStream = message.getContent(InputStream.class);
+			if (originalStream == null) {
+				throw new Fault(new IllegalArgumentException("El InputStream del mensaje SOAP es nulo"));
+			}
 
-            SOAPMessage soapMessage = MessageFactory.newInstance().createMessage(null, new ByteArrayInputStream(soapBytes));
-            //soapMessage.writeTo(System.out); // Solo para depuración
+			byte[] soapBytes = IOUtils.readBytesFromStream(originalStream);
 
-            SOAPBody body = soapMessage.getSOAPBody();
+			SOAPMessage soapMessage = MessageFactory.newInstance().createMessage(null,
+					new ByteArrayInputStream(soapBytes));
 
-            Node payload = null;
+			SOAPBody body = soapMessage.getSOAPBody();
 
-            for (Node node = body.getFirstChild(); node != null; node = node.getNextSibling()) {
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    payload = node;
-                    break;
-                }
-            }
+			Node payload = null;
 
-            if (payload == null) {
-                throw new Fault(new IllegalArgumentException("No se encontró un nodo de tipo ELEMENT en el cuerpo SOAP"));
-            }
+			for (Node node = body.getFirstChild(); node != null; node = node.getNextSibling()) {
+				if (node.getNodeType() == Node.ELEMENT_NODE) {
+					payload = node;
+					break;
+				}
+			}
 
-            //log.debug("Nodo raíz del Body: {}", payload.getNodeName());
+			if (payload == null) {
+				throw new Fault(
+						new IllegalArgumentException("No se encontró un nodo de tipo ELEMENT en el cuerpo SOAP"));
+			}
 
-            //String xmlPayload = nodeToString(payload);
+			schema.newValidator().validate(new DOMSource(payload));
 
-            //log.debug("Contenido que se valida:\n {}", xmlPayload);
+			message.setContent(InputStream.class, new ByteArrayInputStream(soapBytes));
 
-            schema.newValidator().validate(new DOMSource(payload));
+		} catch (Exception e) {
+			throw new Fault(new IllegalArgumentException(
+					"Error de validación del contenido del SOAP Body: " + e.getMessage(), e));
+		}
+	}
 
-            message.setContent(InputStream.class, new ByteArrayInputStream(soapBytes));
+	private String nodeToString(Node node) throws Exception {
+		TransformerFactory tf = TransformerFactory.newInstance();
+		Transformer transformer = tf.newTransformer();
+		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
-        } catch (Exception e) {
-            throw new Fault(new IllegalArgumentException("Error de validación del contenido del SOAP Body: " + e.getMessage(), e));
-        }
-    }
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		transformer.transform(new DOMSource(node), new StreamResult(out));
+		return out.toString("UTF-8");
+	}
 
-    private String nodeToString(Node node) throws Exception {
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer = tf.newTransformer();
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+	private class ClasspathResourceResolver implements LSResourceResolver {
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        transformer.transform(new DOMSource(node), new StreamResult(out));
-        return out.toString("UTF-8");
-    }
+		@Override
+		public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId,
+				String baseURI) {
+			InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream("wsdl/online/" + systemId);
+			if (resourceAsStream == null) {
+				return null;
+			}
+			return new SimpleLSInput(publicId, systemId, resourceAsStream);
+		}
+	}
 
-    private class ClasspathResourceResolver implements LSResourceResolver {
+	private class SimpleLSInput implements LSInput {
+		private String publicId;
+		private String systemId;
+		private InputStream inputStream;
 
-        @Override
-        public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseURI) {
-            InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream("wsdl/online/" + systemId);
-            if (resourceAsStream == null) {
-                return null;
-            }
-            return new SimpleLSInput(publicId, systemId, resourceAsStream);
-        }
-    }
+		public SimpleLSInput(String publicId, String systemId, InputStream inputStream) {
+			this.publicId = publicId;
+			this.systemId = systemId;
+			this.inputStream = inputStream;
+		}
 
-    private class SimpleLSInput implements LSInput {
-        private String publicId;
-        private String systemId;
-        private InputStream inputStream;
+		@Override
+		public Reader getCharacterStream() {
+			return null;
+		}
 
-        public SimpleLSInput(String publicId, String systemId, InputStream inputStream) {
-            this.publicId = publicId;
-            this.systemId = systemId;
-            this.inputStream = inputStream;
-        }
+		@Override
+		public void setCharacterStream(Reader characterStream) {
+		}
 
-        @Override public Reader getCharacterStream() { return null; }
-        @Override public void setCharacterStream(Reader characterStream) {}
-        @Override public InputStream getByteStream() { return inputStream; }
-        @Override public void setByteStream(InputStream byteStream) { this.inputStream = byteStream; }
-        @Override public String getStringData() { return null; }
-        @Override public void setStringData(String stringData) {}
-        @Override public String getSystemId() { return systemId; }
-        @Override public void setSystemId(String systemId) { this.systemId = systemId; }
-        @Override public String getPublicId() { return publicId; }
-        @Override public void setPublicId(String publicId) { this.publicId = publicId; }
-        @Override public String getBaseURI() { return null; }
-        @Override public void setBaseURI(String baseURI) {}
-        @Override public String getEncoding() { return null; }
-        @Override public void setEncoding(String encoding) {}
-        @Override public boolean getCertifiedText() { return false; }
-        @Override public void setCertifiedText(boolean certifiedText) {}
-    }
+		@Override
+		public InputStream getByteStream() {
+			return inputStream;
+		}
+
+		@Override
+		public void setByteStream(InputStream byteStream) {
+			this.inputStream = byteStream;
+		}
+
+		@Override
+		public String getStringData() {
+			return null;
+		}
+
+		@Override
+		public void setStringData(String stringData) {
+		}
+
+		@Override
+		public String getSystemId() {
+			return systemId;
+		}
+
+		@Override
+		public void setSystemId(String systemId) {
+			this.systemId = systemId;
+		}
+
+		@Override
+		public String getPublicId() {
+			return publicId;
+		}
+
+		@Override
+		public void setPublicId(String publicId) {
+			this.publicId = publicId;
+		}
+
+		@Override
+		public String getBaseURI() {
+			return null;
+		}
+
+		@Override
+		public void setBaseURI(String baseURI) {
+		}
+
+		@Override
+		public String getEncoding() {
+			return null;
+		}
+
+		@Override
+		public void setEncoding(String encoding) {
+		}
+
+		@Override
+		public boolean getCertifiedText() {
+			return false;
+		}
+
+		@Override
+		public void setCertifiedText(boolean certifiedText) {
+		}
+	}
 
 }

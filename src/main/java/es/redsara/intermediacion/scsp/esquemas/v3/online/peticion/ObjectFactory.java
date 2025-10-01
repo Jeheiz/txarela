@@ -23,36 +23,35 @@ import javax.xml.namespace.QName;
  */
 @XmlRegistry
 public class ObjectFactory {
-
-    private final static QName _Apellido1_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "Apellido1");
-    private final static QName _Apellido2_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "Apellido2");
-    private final static QName _IdPeticion_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "IdPeticion");
-    private final static QName _NumElementos_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "NumElementos");
-    private final static QName _TimeStamp_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "TimeStamp");
-    private final static QName _CodigoEstado_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "CodigoEstado");
-    private final static QName _CodigoEstadoSecundario_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "CodigoEstadoSecundario");
-    private final static QName _LiteralError_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "LiteralError");
-    private final static QName _TiempoEstimadoRespuesta_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "TiempoEstimadoRespuesta");
-    private final static QName _CodigoCertificado_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "CodigoCertificado");
-    private final static QName _Consentimiento_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "Consentimiento");
-    private final static QName _NifEmisor_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "NifEmisor");
-    private final static QName _NombreEmisor_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "NombreEmisor");
-    private final static QName _IdentificadorSolicitante_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "IdentificadorSolicitante");
-    private final static QName _NombreSolicitante_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "NombreSolicitante");
-    private final static QName _UnidadTramitadora_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "UnidadTramitadora");
-    private final static QName _CodProcedimiento_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "CodProcedimiento");
-    private final static QName _NombreProcedimiento_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "NombreProcedimiento");
-    private final static QName _Finalidad_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "Finalidad");
-    private final static QName _NombreCompletoFuncionario_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "NombreCompletoFuncionario");
-    private final static QName _NifFuncionario_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "NifFuncionario");
-    private final static QName _IdExpediente_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "IdExpediente");
-    private final static QName _TipoDocumentacion_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "TipoDocumentacion");
-    private final static QName _Documentacion_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "Documentacion");
-    private final static QName _NombreCompleto_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "NombreCompleto");
-    private final static QName _Nombre_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "Nombre");
-    private final static QName _IdSolicitud_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "IdSolicitud");
-    private final static QName _IdTransmision_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "IdTransmision");
-    private final static QName _FechaGeneracion_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion", "FechaGeneracion");
+	   private final static QName _Apellido1_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "Apellido1");
+	    private final static QName _Apellido2_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "Apellido2");
+	    private final static QName _IdPeticion_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "IdPeticion");
+	    private final static QName _NumElementos_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "NumElementos");
+	    private final static QName _TimeStamp_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "TimeStamp");
+	    private final static QName _CodigoEstado_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "CodigoEstado");
+	    private final static QName _CodigoEstadoSecundario_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "CodigoEstadoSecundario");
+	    private final static QName _LiteralError_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "LiteralError");
+	    private final static QName _TiempoEstimadoRespuesta_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "TiempoEstimadoRespuesta");
+	    private final static QName _CodigoCertificado_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "CodigoCertificado");
+	    private final static QName _Consentimiento_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "Consentimiento");
+	    private final static QName _NifEmisor_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "NifEmisor");
+	    private final static QName _NombreEmisor_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "NombreEmisor");
+	    private final static QName _IdentificadorSolicitante_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "IdentificadorSolicitante");
+	    private final static QName _NombreSolicitante_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "NombreSolicitante");
+	    private final static QName _UnidadTramitadora_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "UnidadTramitadora");
+	    private final static QName _CodProcedimiento_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "CodProcedimiento");
+	    private final static QName _NombreProcedimiento_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "NombreProcedimiento");
+	    private final static QName _Finalidad_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "Finalidad");
+	    private final static QName _NombreCompletoFuncionario_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "NombreCompletoFuncionario");
+	    private final static QName _NifFuncionario_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "NifFuncionario");
+	    private final static QName _IdExpediente_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "IdExpediente");
+	    private final static QName _TipoDocumentacion_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "TipoDocumentacion");
+	    private final static QName _Documentacion_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "Documentacion");
+	    private final static QName _NombreCompleto_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "NombreCompleto");
+	    private final static QName _Nombre_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "Nombre");
+	    private final static QName _IdSolicitud_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "IdSolicitud");
+	    private final static QName _IdTransmision_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "IdTransmision");
+	    private final static QName _FechaGeneracion_QNAME = new QName("http://intermediacion.redsara.es/scsp/esquemas/V3/peticion", "FechaGeneracion");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: es.redsara.intermediacion.scsp.esquemas.v3.online.peticion

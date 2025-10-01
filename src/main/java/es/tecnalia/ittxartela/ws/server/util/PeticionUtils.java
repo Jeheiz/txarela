@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import es.redsara.intermediacion.scsp.esquemas.ittaxtela.online.peticion.datosespecificos.DatosEspecificosOnlinePeticionItTxartela;
+import es.redsara.intermediacion.scsp.esquemas.datosespecificos.Consulta;
 import es.redsara.intermediacion.scsp.esquemas.v3.online.peticion.DatosGenericos;
 import es.redsara.intermediacion.scsp.esquemas.v3.online.peticion.Peticion;
 import es.redsara.intermediacion.scsp.esquemas.v3.online.peticion.SolicitudTransmision;
@@ -44,15 +44,17 @@ public class PeticionUtils {
 	        .collect(Collectors.toList());
 	}
 
-	public static java.sql.Date extraerFechaLimite(DatosEspecificosOnlinePeticionItTxartela datosEspecificos) throws ParseException {
+    public static java.sql.Date extraerFechaLimite(Consulta datosEspecificos) throws ParseException {
 
-		String fechaStr = datosEspecificos.getFechaLimite().trim();//"09/06/2025";
-		SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
-		Date fechaUtil = formato.parse(fechaStr);
-		java.sql.Date fechaSql = new java.sql.Date(fechaUtil.getTime());
+        if (datosEspecificos == null || datosEspecificos.getFechaLimite() == null) {
+                throw new ParseException("Fecha límite no informada", 0);
+        }
 
-		System.out.println("Fecha SQL: " + fechaSql);
+        String fechaStr = datosEspecificos.getFechaLimite().trim();
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+        Date fechaUtil = formato.parse(fechaStr);
+        java.sql.Date fechaSql = new java.sql.Date(fechaUtil.getTime());
 
-		return fechaSql;
-	}
+        return fechaSql;
+}
 }

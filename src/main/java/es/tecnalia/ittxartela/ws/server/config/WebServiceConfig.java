@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import es.map.xml_schemas.IntermediacionOnlinePortType;
+import es.map.xml_schemas.IntermediacionOnlineAsyncPortType;
 import es.tecnalia.ittxartela.ws.server.interceptor.AuditInputInterceptor;
 import es.tecnalia.ittxartela.ws.server.interceptor.AuditOutputInterceptor;
 import es.tecnalia.ittxartela.ws.server.interceptor.OnlineRequestValidator;
@@ -29,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class WebServiceConfig {
 
 	 private static final QName SYNCSERVICENAME = new QName("http://www.map.es/xml-schemas", "x53JiServicioOnlineIntermediacion");
-
+	 private static final QName ASYNCSERVICENAME = new QName("http://www.map.es/xml-schemas", "x53JiServicioOnlineIntermediacionAsync");
 	@Autowired
 	AuditInputInterceptor auditInputInterceptor;
 
@@ -46,10 +47,11 @@ public class WebServiceConfig {
 
     @Bean
     Endpoint itTxartelaOnlineServiceEndpoint(Bus bus, IntermediacionOnlinePortType service) {
-    	log.info("Se procede a crear el servicio sync");
+        log.info("Se procede a crear el servicio sync");
         EndpointImpl endpoint = new EndpointImpl(bus, service);
-        endpoint.publish("/online");
-        endpoint.setWsdlLocation("classpath:wsdl/online/x53jiServicioIntermediacion.wsdl");
+        endpoint.publish("/ittxartela/online");
+        endpoint.setWsdlLocation("classpath:/wsdl/online/x53jiServicioIntermediacion.wsdl");
+        
 /*
         endpoint.setProperties(Map.of(
         	"schema-validation-enabled", true,
@@ -73,21 +75,30 @@ public class WebServiceConfig {
         inProps.put(WSHandlerConstants.SIG_VER_PROP_FILE, "server-crypto.properties");
         inProps.put(WSHandlerConstants.TTL_TIMESTAMP, "300");
 
-        WSS4JInInterceptor wssIn = new WSS4JInInterceptor(inProps);
-        endpoint.getInInterceptors().add(wssIn);
+        //WSS4JInInterceptor wssIn = new WSS4JInInterceptor(inProps);
+        //endpoint.getInInterceptors().add(wssIn);//
         /**/
 
-        /* Validador */
-        endpoint.getInInterceptors().add(onlineRequestValidator);
+        /* Validador *
+        endpoint.getInInterceptors().add(onlineRequestValidator);/
 
         /* Audit Interceptors */
-        //no me gusta cómo solución para la auditoría. Se ejecuta antes de validarse seguridad o datos.
-        //mejor gestionarlo en cada servicio, eso permite controlar datos que puedan querese guardar en campos concretos
-        //y tener control de la entidad creada, lo que permitiría guardar petición y respuesta en el mismo registro.
+        //Esta línea añade un interceptor de validación personalizado (OnlineRequestValidator) al pipeline de entrada del servicio web.
+        // Esto se ejecuta antes de que se procese la solicitud, 
+        //
         //endpoint.getInInterceptors().add(auditInputInterceptor);
         //endpoint.getOutInterceptors().add(auditOutputInterceptor);
         /**/
         return endpoint;
     }
+    @Bean
+    Endpoint itTxartelaOnlineAsyncServiceEndpoint(Bus bus, IntermediacionOnlineAsyncPortType service) {
+        log.info("Se procede a crear el servicio async");
+        EndpointImpl endpoint = new EndpointImpl(bus, service);
+        endpoint.publish("/ittxartela/onlineAsync");
+        endpoint.setServiceName(ASYNCSERVICENAME);
+        return endpoint;
+    }
+    
 
 }

@@ -1,5 +1,5 @@
 
-package es.redsara.intermediacion.scsp.esquemas.ittaxtela.online.peticion.datosespecificos;
+package es.redsara.intermediacion.scsp.esquemas.datosespecificos;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -7,41 +7,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 
-/**
- * <p>Clase Java para DatosEspecificosOnlinePeticionItTxartela complex type.
- * 
- * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
- * 
- * <pre>
- * &lt;complexType name="DatosEspecificosOnlinePeticionItTxartela"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;all&gt;
- *         &lt;element name="idTraza" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *         &lt;element name="Documentacion" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *         &lt;element name="FechaLimite" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *         &lt;element name="TipoCertificacion"&gt;
- *           &lt;simpleType&gt;
- *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}int"&gt;
- *               &lt;totalDigits value="1"/&gt;
- *               &lt;minInclusive value="0"/&gt;
- *             &lt;/restriction&gt;
- *           &lt;/simpleType&gt;
- *         &lt;/element&gt;
- *       &lt;/all&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
- * 
- * 
- */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "DatosEspecificosOnlinePeticionItTxartela", propOrder = {
+@XmlType(name = "Consulta", propOrder = {
 
 })
-public class DatosEspecificosOnlinePeticionItTxartela {
-
+   public class Consulta {
     @XmlElement(required = true)
     protected String idTraza;
     @XmlElement(name = "Documentacion", required = true)
@@ -129,7 +99,7 @@ public class DatosEspecificosOnlinePeticionItTxartela {
      */
     public int getTipoCertificacion() {
         return tipoCertificacion;
-    }
+    };
 
     /**
      * Define el valor de la propiedad tipoCertificacion.

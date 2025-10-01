@@ -1,5 +1,5 @@
 
-package es.redsara.intermediacion.scsp.esquemas.ittaxtela.online.respuesta.datosespecificos;
+package es.redsara.intermediacion.scsp.esquemas.datosespecificos;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

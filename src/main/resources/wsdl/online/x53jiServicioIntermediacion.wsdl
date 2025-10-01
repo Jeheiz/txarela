@@ -4,17 +4,17 @@
 <definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.map.es/xml-schemas" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://www.map.es/xml-schemas" name="x53jiServicioOnlineIntermediacion">
 	<types>
 		<xsd:schema>
-			<xsd:import namespace="http://intermediacion.redsara.es/scsp/esquemas/V3/online/respuesta" schemaLocation="respuesta.xsd"/>
+				<xsd:import namespace="http://intermediacion.redsara.es/scsp/esquemas/V3/respuesta" schemaLocation="respuesta.xsd"/>
 		</xsd:schema>
 		<xsd:schema>
-			<xsd:import namespace="http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion" schemaLocation="peticion.xsd"/>
+			<xsd:import namespace="http://intermediacion.redsara.es/scsp/esquemas/V3/peticion" schemaLocation="peticion.xsd"/>
 		</xsd:schema>
 	</types>
 	<message name="peticionSincrona">
-		<part xmlns:ns1="http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion" name="peticion" element="ns1:Peticion"/>
+		<part xmlns:ns1="http://intermediacion.redsara.es/scsp/esquemas/V3/peticion" name="peticion" element="ns1:Peticion"/>
 	</message>
 	<message name="peticionSincronaResponse">
-		<part xmlns:ns2="http://intermediacion.redsara.es/scsp/esquemas/V3/online/respuesta" name="respuesta" element="ns2:Respuesta"/>
+		<part xmlns:ns2="http://intermediacion.redsara.es/scsp/esquemas/V3/respuesta" name="respuesta" element="ns2:Respuesta"/>
 	</message>
 	<portType name="IntermediacionOnlinePortType">
 		<operation name="peticionSincrona">

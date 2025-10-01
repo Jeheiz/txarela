@@ -1,5 +1,5 @@
 
-package es.redsara.intermediacion.scsp.esquemas.ittaxtela.online.respuesta.datosespecificos;
+package es.redsara.intermediacion.scsp.esquemas.datosespecificos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element ref="{http://intermediacion.redsara.es/scsp/esquemas/ittaxtela/online/respuesta/datosespecificos}Persona" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://intermediacion.redsara.es/scsp/esquemas/ittaxtela/online/respuesta/datosespecificos}Certificado" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -31,41 +31,41 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "persona"
+    "certificado"
 })
-@XmlRootElement(name = "Personas")
-public class Personas {
+@XmlRootElement(name = "Certificados")
+public class Certificados {
 
-    @XmlElement(name = "Persona")
-    protected List<Persona> persona;
+    @XmlElement(name = "Certificado")
+    protected List<Certificado> certificado;
 
     /**
-     * Gets the value of the persona property.
+     * Gets the value of the certificado property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the persona property.
+     * This is why there is not a <CODE>set</CODE> method for the certificado property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getPersona().add(newItem);
+     *    getCertificado().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Persona }
+     * {@link Certificado }
      * 
      * 
      */
-    public List<Persona> getPersona() {
-        if (persona == null) {
-            persona = new ArrayList<Persona>();
+    public List<Certificado> getCertificado() {
+        if (certificado == null) {
+            certificado = new ArrayList<Certificado>();
         }
-        return this.persona;
+        return this.certificado;
     }
 
 }

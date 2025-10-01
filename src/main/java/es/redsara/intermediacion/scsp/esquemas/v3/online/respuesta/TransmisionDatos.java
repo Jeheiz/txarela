@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import es.redsara.intermediacion.scsp.esquemas.ittaxtela.online.respuesta.datosespecificos.DatosEspecificosOnlineRespuestaItTxartela;
+import es.redsara.intermediacion.scsp.esquemas.datosespecificos.DatosEspecificosItTxartela;
 
 
 /**
@@ -19,8 +19,8 @@ import es.redsara.intermediacion.scsp.esquemas.ittaxtela.online.respuesta.datose
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;all&gt;
- *         &lt;element ref="{http://intermediacion.redsara.es/scsp/esquemas/V3/online/respuesta}DatosGenericos"/&gt;
- *         &lt;element ref="{http://intermediacion.redsara.es/scsp/esquemas/ittaxtela/online/respuesta/datosespecificos}DatosEspecificos"/&gt;
+ *         &lt;element re="{http://intermediacion.redsara.es/scsp/esquemas/V3/respuesta}DatosGenericos"/&gt;
+ *         &lt;element re="{http://intermediacion.redsara.es/scsp/esquemas/datosespecificos}DatosEspecificos"/&gt;
  *       &lt;/all&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -38,8 +38,8 @@ public class TransmisionDatos {
 
     @XmlElement(name = "DatosGenericos", required = true)
     protected DatosGenericos datosGenericos;
-    @XmlElement(name = "DatosEspecificos", namespace = "http://intermediacion.redsara.es/scsp/esquemas/ittaxtela/online/respuesta/datosespecificos", required = true)
-    protected DatosEspecificosOnlineRespuestaItTxartela datosEspecificos;
+    @XmlElement(name = "DatosEspecificos", namespace = "http://intermediacion.redsara.es/scsp/esquemas/datosespecificos", required = true)
+    protected DatosEspecificosItTxartela datosEspecificos;
 
     /**
      * Obtiene el valor de la propiedad datosGenericos.
@@ -70,13 +70,12 @@ public class TransmisionDatos {
      * 
      * @return
      *     possible object is
-     *     {@link DatosEspecificosOnlineRespuestaItTxartela }
+     *      {@link DatosEspecificosItTxartela }
      *     
      */
-    public DatosEspecificosOnlineRespuestaItTxartela getDatosEspecificos() {
+    public DatosEspecificosItTxartela getDatosEspecificos() {
         return datosEspecificos;
     }
-
     /**
      * Define el valor de la propiedad datosEspecificos.
      * 
@@ -85,8 +84,7 @@ public class TransmisionDatos {
      *     {@link DatosEspecificosOnlineRespuestaItTxartela }
      *     
      */
-    public void setDatosEspecificos(DatosEspecificosOnlineRespuestaItTxartela value) {
+    public void setDatosEspecificos(DatosEspecificosItTxartela value) {
         this.datosEspecificos = value;
     }
-
 }

@@ -16,6 +16,34 @@
 --CREATE DATABASE IF NOT EXISTS `itcard20db` /*!40100 DEFAULT CHARACTER SET latin1 */;
 --USE `itcard20db`;
 
+-- Tabla para auditoria
+-- Tabla para auditoria
+CREATE TABLE audit (
+    id IDENTITY PRIMARY KEY,
+    id_peticion VARCHAR(255) NOT NULL,
+    xml_respuesta CLOB,
+    estado VARCHAR(10) NOT NULL,
+    mensaje_estado VARCHAR(255) NOT NULL,
+    detalle_error VARCHAR(500),
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_respuesta_prevista TIMESTAMP NOT NULL,
+    fecha_disponible TIMESTAMP
+);
+
+
+CREATE TABLE async_peticion (
+    id IDENTITY PRIMARY KEY,
+    id_peticion VARCHAR(255),
+    xml_peticion CLOB,
+    xml_respuesta CLOB,
+    estado VARCHAR(20),
+    ter INT
+);
+
+
+
+
 -- Volcando estructura para tabla itcard20db.alumnos
 CREATE TABLE alumnos (
     dni VARCHAR(255) PRIMARY KEY,

@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import es.redsara.intermediacion.scsp.esquemas.ittaxtela.online.peticion.datosespecificos.DatosEspecificosOnlinePeticionItTxartela;
+import es.redsara.intermediacion.scsp.esquemas.datosespecificos.DatosEspecificosItTxartela;
 
 
 /**
@@ -19,7 +19,7 @@ import es.redsara.intermediacion.scsp.esquemas.ittaxtela.online.peticion.datoses
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;all&gt;
- *         &lt;element ref="{http://intermediacion.redsara.es/scsp/esquemas/V3/online/peticion}DatosGenericos"/&gt;
+ *        &lt;element ref="{http://intermediacion.redsara.es/scsp/esquemas/V3/peticion}DatosGenericos"/&gt;
  *         &lt;element ref="{http://intermediacion.redsara.es/scsp/esquemas/ittaxtela/online/peticion/datosespecificos}DatosEspecificos" minOccurs="0"/&gt;
  *       &lt;/all&gt;
  *     &lt;/restriction&gt;
@@ -38,8 +38,8 @@ public class SolicitudTransmision {
 
     @XmlElement(name = "DatosGenericos", required = true)
     protected DatosGenericos datosGenericos;
-    @XmlElement(name = "DatosEspecificos", namespace = "http://intermediacion.redsara.es/scsp/esquemas/ittaxtela/online/peticion/datosespecificos")
-    protected DatosEspecificosOnlinePeticionItTxartela datosEspecificos;
+    @XmlElement(name = "DatosEspecificos", namespace = "http://intermediacion.redsara.es/scsp/esquemas/datosespecificos")
+    protected DatosEspecificosItTxartela datosEspecificos;
 
     /**
      * Obtiene el valor de la propiedad datosGenericos.
@@ -70,10 +70,10 @@ public class SolicitudTransmision {
      * 
      * @return
      *     possible object is
-     *     {@link DatosEspecificosOnlinePeticionItTxartela }
+      {@link DatosEspecificosItTxartela }
      *     
      */
-    public DatosEspecificosOnlinePeticionItTxartela getDatosEspecificos() {
+    public DatosEspecificosItTxartela getDatosEspecificos() {
         return datosEspecificos;
     }
 
@@ -82,10 +82,10 @@ public class SolicitudTransmision {
      * 
      * @param value
      *     allowed object is
-     *     {@link DatosEspecificosOnlinePeticionItTxartela }
+      *     {@link DatosEspecificosItTxartela }
      *     
      */
-    public void setDatosEspecificos(DatosEspecificosOnlinePeticionItTxartela value) {
+    public void setDatosEspecificos(DatosEspecificosItTxartela value) {
         this.datosEspecificos = value;
     }
 
