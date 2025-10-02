@@ -46,23 +46,23 @@ public class XmlUtil {
         public static String obtenerFechaHoraXml() {
 
                 ZonedDateTime ahora = ZonedDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
-        return ahora.format(formatter);
-    }
-
-    public static <T> T fromXml(String xml, Class<T> clazz) {
-        if (xml == null || xml.isBlank()) {
-            throw new IllegalArgumentException("El contenido XML no puede ser nulo o vacío");
+                return ahora.format(formatter);
         }
 
-        try {
-            JAXBContext context = JAXBContext.newInstance(clazz);
-            Unmarshaller unmarshaller = context.createUnmarshaller();
-            Object resultado = unmarshaller.unmarshal(new StringReader(xml));
-            return clazz.cast(resultado);
-        } catch (JAXBException e) {
-            throw new IllegalArgumentException("No ha sido posible convertir el XML al tipo " + clazz.getSimpleName(), e);
+        public static <T> T fromXml(String xml, Class<T> clazz) {
+                if (xml == null || xml.isBlank()) {
+                        throw new IllegalArgumentException("El contenido XML no puede ser nulo o vacío");
+                }
+
+                try {
+                        JAXBContext context = JAXBContext.newInstance(clazz);
+                        Unmarshaller unmarshaller = context.createUnmarshaller();
+                        Object resultado = unmarshaller.unmarshal(new StringReader(xml));
+                        return clazz.cast(resultado);
+                } catch (JAXBException e) {
+                        throw new IllegalArgumentException("No ha sido posible convertir el XML al tipo " + clazz.getSimpleName(), e);
+                }
         }
-    }
 }

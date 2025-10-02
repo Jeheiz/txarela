@@ -8,13 +8,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
-import javax.jws.WebService;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.map.xml_schemas.IntermediacionOnlineAsyncPortType;
 import es.map.xml_schemas.IntermediacionOnlinePortType;
 import es.redsara.intermediacion.scsp.esquemas.datosespecificos.Certificado;
 import es.redsara.intermediacion.scsp.esquemas.datosespecificos.Certificados;
@@ -43,13 +42,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-@WebService(
-            serviceName = "x53jiServicioOnlineIntermediacion",
-            portName = "IntermediacionOnlinePort",
-            targetNamespace = "http://www.map.es/xml-schemas",
-            endpointInterface = "es.map.xml_schemas.IntermediacionOnlinePortType"
-        )
-public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType {
+public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType,
+                IntermediacionOnlineAsyncPortType {
 
         private static final Duration TIEMPO_RESPUESTA_POR_DEFECTO = Duration.ofDays(5);
         private static final DateTimeFormatter FORMATO_FECHA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");

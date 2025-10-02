@@ -6,28 +6,21 @@ import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
 
-
 /**
  * This object contains factory methods for each 
- * Java content interface and element interface 
+ * Java content interface and Java element interface 
  * generated in the es.redsara.intermediacion.scsp.esquemas.datosespecificos package.
- *
- * An ObjectFactory allows you to programmatically 
- * construct new instances of the Java representation 
- * for XML content.
  */
 @XmlRegistry
 public class ObjectFactory {
 
     private final static QName _DatosEspecificos_QNAME = new QName(
-            "http://intermediacion.redsara.es/scsp/esquemas/datosespecificos",
-            "DatosEspecificos");
+            "http://intermediacion.redsara.es/scsp/esquemas/datosespecificos", "DatosEspecificos");
     private final static QName _DatosTraza_QNAME = new QName(
-            "http://intermediacion.redsara.es/scsp/esquemas/datosespecificos",
-            "DatosTraza");
+            "http://intermediacion.redsara.es/scsp/esquemas/datosespecificos", "DatosTraza");
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes.
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: es.redsara.intermediacion.scsp.esquemas.datosespecificos
      */
     public ObjectFactory() {
     }
@@ -96,20 +89,20 @@ public class ObjectFactory {
     }
 
     /**
-     * JAXBElement for DatosEspecificos (namespace único NISAE)
+     * Create an instance of {@link JAXBElement }{@code <}{@link DatosEspecificosItTxartela }{@code >}
      */
-    @XmlElementDecl(namespace = "http://intermediacion.redsara.es/scsp/esquemas/datosespecificos",
-                    name = "DatosEspecificos")
+    @XmlElementDecl(namespace = "http://intermediacion.redsara.es/scsp/esquemas/datosespecificos", name = "DatosEspecificos")
     public JAXBElement<DatosEspecificosItTxartela> createDatosEspecificos(DatosEspecificosItTxartela value) {
         return new JAXBElement<>(_DatosEspecificos_QNAME, DatosEspecificosItTxartela.class, null, value);
     }
 
     /**
-     * JAXBElement for DatosTraza (namespace único NISAE)
+     * Create an instance of {@link JAXBElement }{@code <}{@link Traza }{@code >}
      */
-    @XmlElementDecl(namespace = "http://intermediacion.redsara.es/scsp/esquemas/datosespecificos",
-                    name = "DatosTraza")
+    @XmlElementDecl(namespace = "http://intermediacion.redsara.es/scsp/esquemas/datosespecificos", name = "DatosTraza")
     public JAXBElement<Traza> createDatosTraza(Traza value) {
         return new JAXBElement<>(_DatosTraza_QNAME, Traza.class, null, value);
     }
+
 }
+
