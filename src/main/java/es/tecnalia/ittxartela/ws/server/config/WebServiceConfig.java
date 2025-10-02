@@ -29,13 +29,15 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 public class WebServiceConfig {
 
-	 private static final QName SYNCSERVICENAME = new QName("http://www.map.es/xml-schemas", "x53JiServicioOnlineIntermediacion");
-	 private static final QName ASYNCSERVICENAME = new QName("http://www.map.es/xml-schemas", "x53JiServicioOnlineIntermediacionAsync");
+    private static final QName SYNCSERVICENAME = new QName("http://www.map.es/xml-schemas",
+            "x53jiServicioOnlineIntermediacion");
+private static final QName SYNCPORTNAME = new QName("http://www.map.es/xml-schemas", "IntermediacionOnlinePort");
+private static final QName ASYNCSERVICENAME = new QName("http://www.map.es/xml-schemas",
+            "x53jiServicioOnlineIntermediacionAsync");
+private static final QName ASYNCPORTNAME = new QName("http://www.map.es/xml-schemas", "IntermediacionOnlineAsyncPort");
 	@Autowired
 	AuditInputInterceptor auditInputInterceptor;
 
-	@Autowired
-	AuditOutputInterceptor auditOutputInterceptor;
 
 	@Autowired
 	OnlineRequestValidator onlineRequestValidator;
@@ -51,23 +53,21 @@ public class WebServiceConfig {
         EndpointImpl endpoint = new EndpointImpl(bus, service);
         endpoint.publish("/ittxartela/online");
         endpoint.setWsdlLocation("classpath:/wsdl/online/x53jiServicioIntermediacion.wsdl");
-        
-/*
+        /*
         endpoint.setProperties(Map.of(
-        	"schema-validation-enabled", true,
-        	"schema-validation-enabled-in" , true,
-        	"schema-validation-enabled-out", true
+                "schema-validation-enabled", true,
+                "schema-validation-enabled-in" , true,
+                "schema-validation-enabled-out", true
         ));
-
         endpoint.getProperties().put(
-        	    "jaxb.additionalContextClasses",
-        	    new Class[] {
-        	        es.redsara.intermediacion.scsp.esquemas.ittaxtela.online.peticion.datosespecificos.DatosEspecificosOnlinePeticionItTxartela.class
-        	    }
-        	);
+                    "jaxb.additionalContextClasses",
+                    new Class[] {
+                        es.redsara.intermediacion.scsp.esquemas.datosespecificos.DatosEspecificosItTxartela.class
+                    }
+                );
 */
         endpoint.setServiceName(SYNCSERVICENAME);
-
+        endpoint.setEndpointName(SYNCPORTNAME);
         /* WS-Security */
         Map<String, Object> inProps = new HashMap<>();
 
@@ -91,14 +91,27 @@ public class WebServiceConfig {
         /**/
         return endpoint;
     }
-    @Bean
-    Endpoint itTxartelaOnlineAsyncServiceEndpoint(Bus bus, IntermediacionOnlineAsyncPortType service) {
-        log.info("Se procede a crear el servicio async");
-        EndpointImpl endpoint = new EndpointImpl(bus, service);
-        endpoint.publish("/ittxartela/onlineAsync");
-        endpoint.setServiceName(ASYNCSERVICENAME);
-        return endpoint;
-    }
-    
 
-}
+
+        @Bean
+        Endpoint itTxartelaOnlineAsyncServiceEndpoint(Bus bus, IntermediacionOnlineAsyncPortType service) {
+            log.info("Se procede a crear el servicio async");
+            EndpointImpl endpoint = new EndpointImpl(bus, service);
+            endpoint.publish("/ittxartela/online/async");
+            endpoint.setWsdlLocation("classpath:/wsdl/online/x53jiServicioIntermediacion.wsdl");
+            endpoint.setServiceName(ASYNCSERVICENAME);
+            endpoint.setEndpointName(ASYNCPORTNAME);
+
+            Map<String, Object> inProps = new HashMap<>();
+            inProps.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.TIMESTAMP);
+            inProps.put(WSHandlerConstants.SIG_VER_PROP_FILE, "server-crypto.properties");
+            inProps.put(WSHandlerConstants.TTL_TIMESTAMP, "300");
+
+            WSS4JInInterceptor wssIn = new WSS4JInInterceptor(inProps);
+            endpoint.getInInterceptors().add(wssIn);
+            endpoint.getInInterceptors().add(onlineRequestValidator);
+
+            return endpoint;
+        }
+
+    }

@@ -4,39 +4,87 @@
 <definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.map.es/xml-schemas" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://www.map.es/xml-schemas" name="x53jiServicioOnlineIntermediacion">
 	<types>
 		<xsd:schema>
-				<xsd:import namespace="http://intermediacion.redsara.es/scsp/esquemas/V3/respuesta" schemaLocation="respuesta.xsd"/>
+			<xsd:import namespace="http://intermediacion.redsara.es/scsp/esquemas/V3/respuesta" schemaLocation="respuesta.xsd"/>
 		</xsd:schema>
 		<xsd:schema>
 			<xsd:import namespace="http://intermediacion.redsara.es/scsp/esquemas/V3/peticion" schemaLocation="peticion.xsd"/>
 		</xsd:schema>
 	</types>
-	<message name="peticionSincrona">
-		<part xmlns:ns1="http://intermediacion.redsara.es/scsp/esquemas/V3/peticion" name="peticion" element="ns1:Peticion"/>
-	</message>
-	<message name="peticionSincronaResponse">
-		<part xmlns:ns2="http://intermediacion.redsara.es/scsp/esquemas/V3/respuesta" name="respuesta" element="ns2:Respuesta"/>
-	</message>
-	<portType name="IntermediacionOnlinePortType">
-		<operation name="peticionSincrona">
-			<input message="tns:peticionSincrona"/>
-			<output message="tns:peticionSincronaResponse"/>
-		</operation>
-	</portType>
-	<binding name="IntermediacionOnlinePortBinding" type="tns:IntermediacionOnlinePortType">
-		<soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-		<operation name="peticionSincrona">
-			<soap:operation soapAction="peticionSincrona"/>
-			<input>
-				<soap:body use="literal"/>
-			</input>
-			<output>
-				<soap:body use="literal"/>
-			</output>
-		</operation>
-	</binding>
-	<service name="x53jiServicioOnlineIntermediacion">
+        <message name="peticionSincrona">
+                <part xmlns:ns1="http://intermediacion.redsara.es/scsp/esquemas/V3/peticion" name="peticion" element="ns1:Peticion"/>
+        </message>
+        <message name="peticionSincronaResponse">
+                <part xmlns:ns2="http://intermediacion.redsara.es/scsp/esquemas/V3/respuesta" name="respuesta" element="ns2:Respuesta"/>
+        </message>
+        <message name="peticionAsincrona">
+                <part xmlns:ns3="http://intermediacion.redsara.es/scsp/esquemas/V3/peticion" name="peticion" element="ns3:Peticion"/>
+        </message>
+        <message name="peticionAsincronaResponse">
+                <part xmlns:ns4="http://intermediacion.redsara.es/scsp/esquemas/V3/respuesta" name="respuesta" element="ns4:Respuesta"/>
+        </message>
+        <message name="consultarPeticionAsincrona">
+                <part xmlns:ns5="http://intermediacion.redsara.es/scsp/esquemas/V3/peticion" name="peticion" element="ns5:Peticion"/>
+        </message>
+        <message name="consultarPeticionAsincronaResponse">
+                <part xmlns:ns6="http://intermediacion.redsara.es/scsp/esquemas/V3/respuesta" name="respuesta" element="ns6:Respuesta"/>
+        </message>
+        <portType name="IntermediacionOnlinePortType">
+                <operation name="peticionSincrona">
+                        <input message="tns:peticionSincrona"/>
+                        <output message="tns:peticionSincronaResponse"/>
+                </operation>
+        </portType>
+        <portType name="IntermediacionOnlineAsyncPortType">
+                <operation name="peticionAsincrona">
+                        <input message="tns:peticionAsincrona"/>
+                        <output message="tns:peticionAsincronaResponse"/>
+                </operation>
+                <operation name="consultarPeticionAsincrona">
+                        <input message="tns:consultarPeticionAsincrona"/>
+                        <output message="tns:consultarPeticionAsincronaResponse"/>
+                </operation>
+        </portType>
+        <binding name="IntermediacionOnlinePortBinding" type="tns:IntermediacionOnlinePortType">
+                <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+                <operation name="peticionSincrona">
+                        <soap:operation soapAction="peticionSincrona"/>
+                        <input>
+                                <soap:body use="literal"/>
+                        </input>
+                        <output>
+                                <soap:body use="literal"/>
+                        </output>
+                </operation>
+        </binding>
+        <binding name="IntermediacionOnlineAsyncPortBinding" type="tns:IntermediacionOnlineAsyncPortType">
+                <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+                <operation name="peticionAsincrona">
+                        <soap:operation soapAction="peticionAsincrona"/>
+                        <input>
+                                <soap:body use="literal"/>
+                        </input>
+                        <output>
+                                <soap:body use="literal"/>
+                        </output>
+                </operation>
+                <operation name="consultarPeticionAsincrona">
+                        <soap:operation soapAction="consultarPeticionAsincrona"/>
+                        <input>
+                                <soap:body use="literal"/>
+                        </input>
+                        <output>
+                                <soap:body use="literal"/>
+                        </output>
+                </operation>
+        </binding>
+        <service name="x53jiServicioOnlineIntermediacion">
   <port name="IntermediacionOnlinePort" binding="tns:IntermediacionOnlinePortBinding">
     <soap:address location="http://localhost:8080/ittxartela/online"/>
   </port>
-	</service>
+        </service>
+        <service name="x53jiServicioOnlineIntermediacionAsync">
+  <port name="IntermediacionOnlineAsyncPort" binding="tns:IntermediacionOnlineAsyncPortBinding">
+    <soap:address location="http://localhost:8080/ittxartela/online/async"/>
+  </port>
+        </service>
 </definitions>
