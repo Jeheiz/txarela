@@ -17,9 +17,11 @@ public class X53JiServicioOnlineIntermediacion extends Service {
 
 	public static final URL WSDL_LOCATION;
 
-	public static final QName SERVICE = new QName("http://www.map.es/xml-schemas", "x53jiServicioOnlineIntermediacion");
-	public static final QName IntermediacionOnlinePort = new QName("http://www.map.es/xml-schemas",
-			"IntermediacionOnlinePort");
+        public static final QName SERVICE = new QName("http://www.map.es/xml-schemas", "x53jiServicioOnlineIntermediacion");
+        public static final QName IntermediacionOnlinePort = new QName("http://www.map.es/xml-schemas",
+                        "IntermediacionOnlinePort");
+        public static final QName IntermediacionOnlineAsyncPort = new QName("http://www.map.es/xml-schemas",
+                        "IntermediacionOnlineAsyncPort");
 	static {
 		URL url = X53JiServicioOnlineIntermediacion.class.getClassLoader()
 				.getResource("wsdl/online/x53jiServicioIntermediacion.wsdl");
@@ -72,9 +74,28 @@ public class X53JiServicioOnlineIntermediacion extends Service {
 	 *                 values.
 	 * @return returns IntermediacionOnlinePortType
 	 */
-	@WebEndpoint(name = "IntermediacionOnlinePort")
-	public IntermediacionOnlinePortType getIntermediacionOnlinePort(WebServiceFeature... features) {
-		return super.getPort(IntermediacionOnlinePort, IntermediacionOnlinePortType.class, features);
-	}
+        @WebEndpoint(name = "IntermediacionOnlinePort")
+        public IntermediacionOnlinePortType getIntermediacionOnlinePort(WebServiceFeature... features) {
+                return super.getPort(IntermediacionOnlinePort, IntermediacionOnlinePortType.class, features);
+        }
+
+        /**
+         *
+         * @return returns IntermediacionOnlineAsyncPortType
+         */
+        @WebEndpoint(name = "IntermediacionOnlineAsyncPort")
+        public IntermediacionOnlineAsyncPortType getIntermediacionOnlineAsyncPort() {
+                return super.getPort(IntermediacionOnlineAsyncPort, IntermediacionOnlineAsyncPortType.class);
+        }
+
+        /**
+         *
+         * @param features A list of {@link javax.xml.ws.WebServiceFeature} to configure on the proxy.
+         * @return returns IntermediacionOnlineAsyncPortType
+         */
+        @WebEndpoint(name = "IntermediacionOnlineAsyncPort")
+        public IntermediacionOnlineAsyncPortType getIntermediacionOnlineAsyncPort(WebServiceFeature... features) {
+                return super.getPort(IntermediacionOnlineAsyncPort, IntermediacionOnlineAsyncPortType.class, features);
+        }
 
 }
