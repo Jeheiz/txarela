@@ -21,18 +21,18 @@ public class AsyncPeticion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "id_peticion", unique = true)
+    @Column(name = "id_peticion", unique = true, nullable = false, length = 255)
     private String idPeticion;
 
     @Lob
-    @Column(name = "xml_peticion")
+    @Column(name = "xml_peticion", columnDefinition = "CLOB")
     private String xmlPeticion;
 
     @Lob
-    @Column(name = "xml_respuesta")
+    @Column(name = "xml_respuesta", columnDefinition = "CLOB")
     private String xmlRespuesta;
 
-    @Column(name = "estado")
+    @Column(name = "estado", length = 10)
     private String estado;
 
     @Column(name = "ter")

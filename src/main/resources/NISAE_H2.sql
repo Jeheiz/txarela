@@ -21,6 +21,7 @@
 CREATE TABLE audit (
     id IDENTITY PRIMARY KEY,
     id_peticion VARCHAR(255) NOT NULL,
+    xml_peticion CLOB,
     xml_respuesta CLOB,
     estado VARCHAR(10) NOT NULL,
     mensaje_estado VARCHAR(255) NOT NULL,
