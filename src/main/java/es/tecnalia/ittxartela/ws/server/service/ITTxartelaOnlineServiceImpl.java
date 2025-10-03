@@ -21,8 +21,11 @@ import es.redsara.intermediacion.scsp.esquemas.datosespecificos.EstadoResultado;
 import es.redsara.intermediacion.scsp.esquemas.datosespecificos.Retorno;
 import es.redsara.intermediacion.scsp.esquemas.datosespecificos.Traza;
 import es.redsara.intermediacion.scsp.esquemas.v3.online.peticion.Peticion;
+import es.redsara.intermediacion.scsp.esquemas.v3.online.peticion.SolicitudTransmision;
 import es.redsara.intermediacion.scsp.esquemas.v3.online.respuesta.Estado;
 import es.redsara.intermediacion.scsp.esquemas.v3.online.respuesta.Respuesta;
+import es.redsara.intermediacion.scsp.esquemas.v3.online.respuesta.TransmisionDatos;
+import es.redsara.intermediacion.scsp.esquemas.v3.online.respuesta.Transmisiones;
 import es.tecnalia.ittxartela.ws.server.constant.EstadoPeticionAsincrona;
 import es.tecnalia.ittxartela.ws.server.model.Audit;
 import es.tecnalia.ittxartela.ws.server.model.AsyncPeticion;
@@ -62,9 +65,26 @@ public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType
         Respuesta respuesta = generarRespuestaValidada(peticion);
 
         audit.setXmlRespuesta(XmlUtil.toXml(respuesta));
-        audit.setMensajeEstado(EstadoPeticionAsincrona.DISPONIBLE.getDescripcion());
-        audit.setFechaDisponible(LocalDateTime.now());
-        audit.setDetalleError(null);
+       
+        Estado estadoRespuesta = respuesta != null && respuesta.getAtributos() != null
+                ? respuesta.getAtributos().getEstado()
+                : null;
+
+        LocalDateTime ahora = LocalDateTime.now();
+
+        if (estadoRespuesta != null
+                && EstadoPeticionAsincrona.ERROR.getCodigo().equals(estadoRespuesta.getCodigoEstado())) {
+            audit.setEstado(EstadoPeticionAsincrona.ERROR.getCodigo());
+            audit.setMensajeEstado(EstadoPeticionAsincrona.ERROR.getDescripcion());
+            audit.setDetalleError(estadoRespuesta.getLiteralError());
+            audit.setFechaDisponible(ahora);
+        } else {
+            audit.setEstado(EstadoPeticionAsincrona.DISPONIBLE.getCodigo());
+            audit.setMensajeEstado(EstadoPeticionAsincrona.DISPONIBLE.getDescripcion());
+            audit.setDetalleError(null);
+            audit.setFechaDisponible(ahora);
+        }
+
         auditRepository.save(audit);
 
         log.info("peticionSincrona respuesta generada {}", XmlUtil.toXml(respuesta));
@@ -84,7 +104,8 @@ public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType
             Audit audit = crearRegistroAuditoria(peticion, EstadoPeticionAsincrona.ERROR, LocalDateTime.now());
 
             Respuesta respuestaError = construirRespuestaBase(peticion);
-            aplicarError(respuestaError, error.get());
+          
+            aplicarError(respuestaError, peticion, error.get());
             asegurarEstado(respuestaError).setTiempoEstimadoRespuesta(0);
 
             audit.setMensajeEstado("Petición rechazada: " + error.get().getMensaje());
@@ -110,83 +131,7 @@ public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType
 
         asegurarTransmisionDatos(respuesta).setDatosEspecificos(crearDatosEstado(peticion, audit));
 
-        audit.setXmlRespuesta(XmlUtil.toXml(respuesta));
-        auditRepository.save(audit);
-
-        guardarAsyncPeticion(peticion, respuesta, EstadoPeticionAsincrona.RECIBIDA, estado.getTiempoEstimadoRespuesta());
-
-        log.info("peticionAsincrona {} almacenada con estado {}", peticion.getAtributos().getIdPeticion(),
-                EstadoPeticionAsincrona.RECIBIDA.getDescripcion());
-
-        return respuesta;
-    }
-
-    // --- Procesamiento diferido ---
-    @Transactional
-    @Scheduled(fixedDelayString = "${ittxartela.async.polling-interval-ms:60000}")
-    public void procesarPeticionesAsincronasPendientes() {
-        List<AsyncPeticion> pendientes = asyncPeticionRepository
-                .findByEstadoOrderByIdAsc(EstadoPeticionAsincrona.RECIBIDA.getCodigo());
-
-        for (AsyncPeticion async : pendientes) {
-            try {
-                Audit audit = auditRepository.findTopByIdPeticionOrderByIdDesc(async.getIdPeticion());
-                Peticion peticion = XmlUtil.fromXml(async.getXmlPeticion(), Peticion.class);
-
-                Respuesta respuestaFinal = generarRespuestaValidada(peticion);
-
-                if (audit != null) {
-                    audit.setXmlRespuesta(XmlUtil.toXml(respuestaFinal));
-                    audit.setEstado(EstadoPeticionAsincrona.DISPONIBLE.getCodigo());
-                    audit.setMensajeEstado(EstadoPeticionAsincrona.DISPONIBLE.getDescripcion());
-                    audit.setDetalleError(null);
-                    audit.setFechaDisponible(LocalDateTime.now());
-                    auditRepository.save(audit);
-                }
-
-                guardarAsyncPeticion(peticion, respuestaFinal, EstadoPeticionAsincrona.DISPONIBLE, 0);
-
-                log.info("Petición asincrona {} procesada correctamente", async.getIdPeticion());
-
-            } catch (Exception e) {
-                log.error("Error procesando la petición asincrona {}", async.getIdPeticion(), e);
-                async.setEstado(EstadoPeticionAsincrona.ERROR.getCodigo());
-                async.setTer(0);
-                asyncPeticionRepository.save(async);
-            }
-        }
-    }
-
-    // --- Consultar asíncrono ---
-    @Override
-    @Transactional
-    public Respuesta consultarPeticionAsincrona(Peticion peticionConsulta) {
-        log.info("consultarPeticionAsincrona recibida {}",
-                peticionConsulta != null ? XmlUtil.toXml(peticionConsulta) : "<peticion nula>");
-
-        if (peticionConsulta == null || peticionConsulta.getAtributos() == null
-                || peticionConsulta.getAtributos().getIdPeticion() == null
-                || peticionConsulta.getAtributos().getIdPeticion().isBlank()) {
-            throw new IllegalArgumentException("El identificador de petición es obligatorio");
-        }
-
-        String idPeticion = peticionConsulta.getAtributos().getIdPeticion();
-        AsyncPeticion asyncPeticion = asyncPeticionRepository.findByIdPeticion(idPeticion);
-
-        if (asyncPeticion == null) {
-            throw new IllegalArgumentException("No se ha encontrado la petición " + idPeticion);
-        }
-
-        Audit audit = auditRepository.findTopByIdPeticionOrderByIdDesc(idPeticion);
-
-        // Caso DISPONIBLE
-        if (EstadoPeticionAsincrona.DISPONIBLE.matches(asyncPeticion.getEstado())
-                && asyncPeticion.getXmlRespuesta() != null) {
-            Respuesta respuestaAlmacenada = reconstruirRespuesta(asyncPeticion.getXmlRespuesta(), idPeticion);
-            if (respuestaAlmacenada != null) {
-                return respuestaAlmacenada;
-            }
-        }
+@@ -190,72 +210,281 @@ public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType
 
         // Caso RECIBIDA
         Peticion peticion = reconstruirPeticion(asyncPeticion, audit, idPeticion);
@@ -212,6 +157,217 @@ public class ITTxartelaOnlineServiceImpl implements IntermediacionOnlinePortType
     }
 
     // --- Helpers ---
+    private Respuesta generarRespuestaValidada(Peticion peticion) {
+        Objects.requireNonNull(peticion, "La petición no puede ser nula");
+
+        Respuesta respuesta = construirRespuestaBase(peticion);
+
+        Optional<PeticionValidator.RespuestaError> error = peticionValidator.validar(peticion);
+        if (error.isPresent()) {
+            aplicarError(respuesta, peticion, error.get());
+        } else {
+            aplicarRespuestaCorrecta(respuesta, peticion);
+        }
+
+        return respuesta;
+    }
+
+    private Respuesta construirRespuestaBase(Peticion peticion) {
+        Respuesta respuesta = mapper.map(peticion, Respuesta.class);
+
+        if (respuesta.getAtributos() == null) {
+            respuesta.setAtributos(new es.redsara.intermediacion.scsp.esquemas.v3.online.respuesta.Atributos());
+        }
+
+        respuesta.getAtributos().setTimeStamp(XmlUtil.obtenerFechaHoraXml());
+        asegurarEstado(respuesta);
+        asegurarTransmisionDatos(respuesta);
+
+        return respuesta;
+    }
+
+    private Audit crearRegistroAuditoria(Peticion peticion, EstadoPeticionAsincrona estadoInicial,
+                                         LocalDateTime fechaRespuestaPrevista) {
+        Objects.requireNonNull(peticion, "La petición no puede ser nula");
+        Objects.requireNonNull(estadoInicial, "El estado inicial es obligatorio");
+
+        Audit audit = new Audit();
+        audit.setIdPeticion(obtenerIdPeticion(peticion));
+        audit.setXmlPeticion(XmlUtil.toXml(peticion));
+        audit.setEstado(estadoInicial.getCodigo());
+        audit.setMensajeEstado(estadoInicial.getDescripcion());
+        audit.setDetalleError(null);
+        audit.setFechaRespuestaPrevista(
+                fechaRespuestaPrevista != null ? fechaRespuestaPrevista : LocalDateTime.now());
+
+        return audit;
+    }
+
+    private void aplicarError(Respuesta respuesta, Peticion peticion, PeticionValidator.RespuestaError error) {
+        Estado estado = asegurarEstado(respuesta);
+        estado.setCodigoEstado(EstadoPeticionAsincrona.ERROR.getCodigo());
+        estado.setCodigoEstadoSecundario(error.getCodigo());
+        estado.setLiteralError(error.getMensaje());
+        estado.setTiempoEstimadoRespuesta(0);
+
+        DatosEspecificosItTxartela datosEspecificos = crearDatosEspecificosComun(
+                peticion,
+                error.getCodigo(),
+                error.getMensaje(),
+                null
+        );
+        asegurarTransmisionDatos(respuesta).setDatosEspecificos(datosEspecificos);
+    }
+
+    private void aplicarRespuestaCorrecta(Respuesta respuesta, Peticion peticion) {
+        Estado estado = asegurarEstado(respuesta);
+        estado.setCodigoEstado("0000");
+        estado.setCodigoEstadoSecundario(null);
+        estado.setLiteralError("Operación realizada correctamente");
+        estado.setTiempoEstimadoRespuesta(0);
+
+        DatosEspecificosItTxartela datosEspecificos = crearDatosEspecificosComun(
+                peticion,
+                "0000",
+                "Operación realizada correctamente",
+                null
+        );
+        asegurarTransmisionDatos(respuesta).setDatosEspecificos(datosEspecificos);
+    }
+
+    private Estado asegurarEstado(Respuesta respuesta) {
+        if (respuesta.getAtributos().getEstado() == null) {
+            respuesta.getAtributos().setEstado(new Estado());
+        }
+        return respuesta.getAtributos().getEstado();
+    }
+
+    private void establecerTiempoEstimadoRespuesta(Estado estado, Duration duracion) {
+        if (estado == null || duracion == null) {
+            return;
+        }
+
+        long minutos = Math.max(0, duracion.toMinutes());
+        estado.setTiempoEstimadoRespuesta((int) Math.min(Integer.MAX_VALUE, minutos));
+    }
+
+    private TransmisionDatos asegurarTransmisionDatos(Respuesta respuesta) {
+        if (respuesta.getTransmisiones() == null) {
+            respuesta.setTransmisiones(new Transmisiones());
+        }
+
+        List<TransmisionDatos> transmisiones = respuesta.getTransmisiones().getTransmisionDatos();
+        if (transmisiones.isEmpty()) {
+            transmisiones.add(new TransmisionDatos());
+        }
+
+        return transmisiones.get(0);
+    }
+
+    private DatosEspecificosItTxartela crearDatosEstado(Peticion peticion, Audit audit) {
+        String codigo = audit != null && audit.getEstado() != null
+                ? audit.getEstado()
+                : EstadoPeticionAsincrona.RECIBIDA.getCodigo();
+        String descripcion = audit != null && audit.getMensajeEstado() != null
+                ? audit.getMensajeEstado()
+                : EstadoPeticionAsincrona.RECIBIDA.getDescripcion();
+        LocalDateTime fechaLimite = audit != null ? audit.getFechaRespuestaPrevista() : LocalDateTime.now();
+
+        return crearDatosEspecificosComun(peticion, codigo, descripcion, fechaLimite);
+    }
+
+    private DatosEspecificosItTxartela crearDatosEspecificosComun(Peticion peticion, String codigoResultado,
+                                                                  String descripcionResultado,
+                                                                  LocalDateTime fechaPrevista) {
+        DatosEspecificosItTxartela datos = new DatosEspecificosItTxartela();
+
+        Consulta consulta = copiarConsultaDesdePeticion(peticion);
+        if (consulta == null) {
+            consulta = construirConsultaPorDefecto(peticion, fechaPrevista);
+        }
+
+        if (fechaPrevista != null) {
+            consulta.setFechaLimite(fechaPrevista.format(FORMATO_FECHA_HORA));
+        } else if (consulta.getFechaLimite() == null || consulta.getFechaLimite().isBlank()) {
+            consulta.setFechaLimite(LocalDateTime.now().format(FORMATO_FECHA_HORA));
+        }
+
+        if (consulta.getDocumentacion() == null || consulta.getDocumentacion().isBlank()) {
+            consulta.setDocumentacion(obtenerDocumentoPrincipal(peticion));
+        }
+
+        if (consulta.getIdTraza() == null || consulta.getIdTraza().isBlank()) {
+            consulta.setIdTraza(obtenerIdPeticion(peticion));
+        }
+
+        datos.setConsulta(consulta);
+
+        Retorno retorno = new Retorno();
+        Traza traza = new Traza();
+        traza.setIdTraza(consulta.getIdTraza());
+        traza.setIdPeticion(obtenerIdPeticion(peticion));
+        retorno.setDatosTraza(traza);
+
+        EstadoResultado estadoResultado = new EstadoResultado();
+        estadoResultado.setResultado(codigoResultado);
+        estadoResultado.setDescripcion(descripcionResultado);
+        retorno.setEstadoResultado(estadoResultado);
+
+        datos.setRetorno(retorno);
+
+        return datos;
+    }
+
+    private Consulta copiarConsultaDesdePeticion(Peticion peticion) {
+        SolicitudTransmision solicitud = obtenerPrimeraSolicitud(peticion);
+        if (solicitud != null && solicitud.getDatosEspecificos() != null
+                && solicitud.getDatosEspecificos().getConsulta() != null) {
+            Consulta original = solicitud.getDatosEspecificos().getConsulta();
+            Consulta copia = new Consulta();
+            copia.setIdTraza(original.getIdTraza());
+            copia.setDocumentacion(original.getDocumentacion());
+            copia.setFechaLimite(original.getFechaLimite());
+            copia.setTipoCertificacion(original.getTipoCertificacion());
+            return copia;
+        }
+        return null;
+    }
+
+    private Consulta construirConsultaPorDefecto(Peticion peticion, LocalDateTime fechaPrevista) {
+        Consulta consulta = new Consulta();
+        consulta.setIdTraza(obtenerIdPeticion(peticion));
+        consulta.setDocumentacion(obtenerDocumentoPrincipal(peticion));
+        LocalDateTime fecha = fechaPrevista != null ? fechaPrevista : LocalDateTime.now().plus(TIEMPO_RESPUESTA_POR_DEFECTO);
+        consulta.setFechaLimite(fecha.format(FORMATO_FECHA_HORA));
+        consulta.setTipoCertificacion(0);
+        return consulta;
+    }
+
+    private String obtenerDocumentoPrincipal(Peticion peticion) {
+        SolicitudTransmision solicitud = obtenerPrimeraSolicitud(peticion);
+        if (solicitud != null && solicitud.getDatosGenericos() != null
+                && solicitud.getDatosGenericos().getTitular() != null) {
+            return Optional.ofNullable(solicitud.getDatosGenericos().getTitular().getDocumentacion())
+                    .orElse("");
+        }
+        return "";
+    }
+
+    private String obtenerIdPeticion(Peticion peticion) {
+        return peticion != null && peticion.getAtributos() != null
+                ? peticion.getAtributos().getIdPeticion()
+                : null;
+    }
+
+    private SolicitudTransmision obtenerPrimeraSolicitud(Peticion peticion) {
+        if (peticion == null || peticion.getSolicitudes() == null
+                || peticion.getSolicitudes().getSolicitudTransmision() == null
+                || peticion.getSolicitudes().getSolicitudTransmision().isEmpty()) {
+            return null;
+        }
+        return peticion.getSolicitudes().getSolicitudTransmision().get(0);
+    }
+
     private void guardarAsyncPeticion(Peticion peticion, Respuesta respuesta, EstadoPeticionAsincrona estado,
                                       Integer tiempoEstimadoRespuesta) {
         Objects.requireNonNull(peticion, "La petición no puede ser nula");
