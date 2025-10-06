@@ -21,13 +21,12 @@ import es.tecnalia.ittxartela.ws.server.interceptor.AuditOutputInterceptor;
 import es.tecnalia.ittxartela.ws.server.interceptor.OnlineRequestValidator;
 import lombok.extern.slf4j.Slf4j;
 import es.map.xml_schemas.IntermediacionOnlineAsyncPortType;
-/**
-* Configuración centralizada de los servicios SOAP expuestos mediante Apache CXF.
- */
+
 @Slf4j
 @Configuration
 public class WebServiceConfig {
-	private static final String WSDL_LOCATION = "classpath:/wsdl/online/x53jiServicioIntermediacion.wsdl";
+
+    private static final String WSDL_LOCATION = "classpath:/wsdl/online/x53jiServicioIntermediacion.wsdl";
     private static final QName SERVICE_NAME = new QName("http://www.map.es/xml-schemas", "x53jiServicioOnlineIntermediacion");
     private static final QName SYNC_PORT_NAME = new QName("http://www.map.es/xml-schemas", "IntermediacionOnlinePort");
     private static final QName ASYNC_PORT_NAME = new QName("http://www.map.es/xml-schemas", "IntermediacionOnlineAsyncPort");
@@ -49,6 +48,7 @@ public class WebServiceConfig {
         return new SpringBus();
     }
 
+    /** Publica el servicio SÍNCRONO */
     @Bean
     public Endpoint itTxartelaOnlineServiceEndpoint(Bus bus, IntermediacionOnlinePortType service) {
         String relativeAddress = "/online";
@@ -57,14 +57,16 @@ public class WebServiceConfig {
         return endpoint;
     }
 
+    /** Publica el servicio ASÍNCRONO */
     @Bean
     public Endpoint itTxartelaOnlineAsyncServiceEndpoint(Bus bus, IntermediacionOnlineAsyncPortType service) {
-        String relativeAddress = "/onlineAsync";
+        String relativeAddress = "/online/async"; // ✅ cambiado a ruta coherente con WSDL
         EndpointImpl endpoint = createEndpoint(bus, service, relativeAddress, ASYNC_PORT_NAME);
         log.info("Servicio asíncrono publicado en {}", buildPublishedUrl(relativeAddress));
         return endpoint;
     }
 
+    /** Configura cada endpoint con interceptores y seguridad */
     private EndpointImpl createEndpoint(Bus bus, Object implementor, String relativeAddress, QName portName) {
         String normalizedAddress = ensureLeadingSlash(relativeAddress);
 
@@ -81,6 +83,7 @@ public class WebServiceConfig {
         return endpoint;
     }
 
+    /** Configura seguridad WS-Security */
     private void addSecurityInterceptors(EndpointImpl endpoint) {
         Map<String, Object> inProps = new HashMap<>();
         inProps.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.TIMESTAMP);
