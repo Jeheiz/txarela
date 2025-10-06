@@ -19,46 +19,33 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 })
 public interface IntermediacionOnlineAsyncPortType {
 
-    @WebMethod(action = "peticionSincrona")
-    @WebResult(
-        name = "Respuesta",
-        targetNamespace = "http://intermediacion.redsara.es/scsp/esquemas/V3/respuesta",
-        partName = "respuesta"
-    )
-    public es.redsara.intermediacion.scsp.esquemas.v3.online.respuesta.Respuesta peticionSincrona(
-        @WebParam(
-            partName = "peticion",
-            name = "Peticion",
-            targetNamespace = "http://intermediacion.redsara.es/scsp/esquemas/V3/peticion"
-        )
-        es.redsara.intermediacion.scsp.esquemas.v3.online.peticion.Peticion peticion
-    );
 
-    @WebMethod(action = "peticionAsincrona")
-    @WebResult(
-        name = "Respuesta",
-        targetNamespace = "http://intermediacion.redsara.es/scsp/esquemas/V3/respuesta",
-        partName = "respuesta"
-    )
-    public es.redsara.intermediacion.scsp.esquemas.v3.online.respuesta.Respuesta peticionAsincrona(
-        @WebParam(
-            partName = "peticion",
-            name = "Peticion",
-            targetNamespace = "http://intermediacion.redsara.es/scsp/esquemas/V3/peticion"
-        )
-        es.redsara.intermediacion.scsp.esquemas.v3.online.peticion.Peticion peticion
-    );
 
-    @WebMethod(action = "consultarPeticionAsincrona")
-    @WebResult(
-        name = "Respuesta",
-        targetNamespace = "http://intermediacion.redsara.es/scsp/esquemas/V3/respuesta",
-        partName = "respuesta"
-    )
-    public es.redsara.intermediacion.scsp.esquemas.v3.online.respuesta.Respuesta consultarPeticionAsincrona(
-        @WebParam(
-            partName = "peticion",
-            name = "Peticion",
+	   @WebMethod(action = "peticionAsincrona")
+	    @WebResult(
+	        name = "Respuesta",
+	        targetNamespace = "http://intermediacion.redsara.es/scsp/esquemas/V3/respuesta",
+	        partName = "respuesta"
+	    )
+	    public es.redsara.intermediacion.scsp.esquemas.v3.online.respuesta.Respuesta peticionAsincrona(
+	        @WebParam(
+	            partName = "peticion",
+	            name = "Peticion",
+	            targetNamespace = "http://intermediacion.redsara.es/scsp/esquemas/V3/peticion"
+	        )
+	        es.redsara.intermediacion.scsp.esquemas.v3.online.peticion.Peticion peticion
+	    );
+
+	    @WebMethod(action = "consultarPeticionAsincrona")
+	    @WebResult(
+	        name = "Respuesta",
+	        targetNamespace = "http://intermediacion.redsara.es/scsp/esquemas/V3/respuesta",
+	        partName = "respuesta"
+	    )
+	    public es.redsara.intermediacion.scsp.esquemas.v3.online.respuesta.Respuesta consultarPeticionAsincrona(
+	        @WebParam(
+	            partName = "peticion",
+	            name = "Peticion",
             targetNamespace = "http://intermediacion.redsara.es/scsp/esquemas/V3/peticion"
         )
         es.redsara.intermediacion.scsp.esquemas.v3.online.peticion.Peticion peticion
